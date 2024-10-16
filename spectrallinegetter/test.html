@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TEST</title>
+</head>
+<body>
+    <canvas></canvas>
+    <img crossorigin="anonymous" src="ClassM5.png">
+    <script>
+        const canvas = document.querySelector('canvas');
+        const ctx = canvas.getContext('2d');
+
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+
+        const image = document.querySelector('img');
+
+        image.onload = () => {
+            ctx.drawImage(image, 0, -image.height/4, image.width/2, image.height/2);
+            const imageData = ctx.getImageData(0, 0, image.width/2, 1);
+
+            const decipher = (v, i) => {
+                if (i % 4 == 0) return '[' + v
+                if (i % 4 == 1) return ', ' + v + ', '
+                if (i % 4 == 2) return v + '], '
+                if (i % 4 == 3) return ''
+            }
+            console.log(Array.from(imageData.data).map(decipher).join(''));
+        }
+    </script>
+</body>
+</html>

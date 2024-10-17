@@ -2196,7 +2196,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const longestDescriptionLength = Math.max(minimumInputSize, Math.max(...descriptions.map((_, i) => descriptions[i].length + units[i].length + 2)));
             for (let i = 0; i < variables.length; i++) {
                 const input = document.createElement('input');
-                input.placeholder = `${descriptions[i]}`;
+                input.title = input.placeholder = `${descriptions[i]}`;
                 input.isSolverInput = true;
                 input.size = longestDescriptionLength;
                 input.unit = units[i];
@@ -2553,7 +2553,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             hrClassifier.appendChild(header);
 
             const typeInput = document.createElement('input')
-            typeInput.placeholder = 'Stellar Classification';
+            typeInput.title = typeInput.placeholder = 'Stellar Classification';
             typeInput.textInputRequired = true;
             typeInput.unit = specialUnits.none;
             typeInput.size = 50;
@@ -2568,7 +2568,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                 const newInput = document.createElement('input');
                 newInput.unit = specialUnits[split[1]] ?? split[1];
-                newInput.placeholder = split[0];
+                newInput.title = newInput.placeholder = split[0];
                 newInput.isSolverInput = true;
                 newInput.size = 50;
                 inputs.push(newInput);

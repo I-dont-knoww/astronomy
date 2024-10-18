@@ -808,9 +808,21 @@ L * ((v ** 4) / (V ** 4))
 `).trim();
 
         const specialClassifications = {
-            main: '(M|K|G|F|A|B|O)&V&!IV&!VI',
-            giant: 'Ia0|Ia|Ib|II|III|IV'
+            mainsequencestar: '(O|B|A|F|G|K|M)',
+            supergiantstar: '((Ia|Ib)&!Ia0)',
+            giantstar: '(Ia0|Ia|Ib|II|III|IV)',
+
+            whitedwarf: 'D',
+            subdwarf: 'VI',
+            dwarf: '(V&!IV&!VI)',
+            subgiant: 'IV',
+            normalgiant: 'III',
+            brightgiant: '(II&!III)',
+            lessluminoussupergiant: 'Ib',
+            luminoussupergiant: '(Ia&!Ia0)',
+            hypergiant: 'Ia0'
         };
+
         // http://www.isthe.com/chongo/tech/astro/HR-temp-mass-table-byhrclass.html
         const hrInputs = `
 Mass;Ms
@@ -1974,8 +1986,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             const type = {
                 Ia0: 'Hypergiant',
-                Ia: 'Very Luminous Supergiant',
-                Ib: 'Luminous Supergiant',
+                Ia: 'Luminous Supergiant',
+                Ib: 'Less Luminous Supergiant',
                 II: 'Bright Giant',
                 III: 'Giant',
                 IV: 'Subgiant',
@@ -1996,8 +2008,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 C: `Carbon Rich Class C${number} ${type}`,
                 S: `Class S${number} ${type} with ZrO Emission Lines`,
                 DA: `Hydrogen Rich Class DA${number} White Dwarf`,
+                DB: `Neutral Helium Rich Class DB${number} White Dwarf`,
                 DC: `Class DC${number} White Dwarf with No Strong Spectra`,
-                DO: `Helium Rich Class DO${number} White Dwarf`,
+                DO: `Ionized Helium Rich Class DO${number} White Dwarf`,
                 DQ: `Carbon Rich Class DQ${number} White Dwarf`,
                 DZ: `Metal Rich Class DZ${number} White Dwarf`
             })[classification]})(starClass.slice(0, index), starClass[index], type[starClass.slice(index + 1)]);

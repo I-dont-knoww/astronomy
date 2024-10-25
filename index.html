@@ -20,7 +20,7 @@
             display: block;
         }
 
-        #unitConverter, #importHolder, #hrClassifier {
+        #unitConverter, #importHolder, #hrClassifier, #searchMenu {
             position: fixed;
 
             left: 50%;
@@ -64,6 +64,12 @@
     <div id="equationSolver"></div>
     <div id="unitConverter"></div>
     <div id="hrClassifier"></div>
+    <div id="searchMenu">
+        <h2>Search Menu</h2>
+        <input><br><br>
+        <button>search</button><br>
+        <span></span>
+    </div>
     <div id="currentNumberMode">
         <span>Current Number Mode: <b id="currentNumberModeText">Default</b></span>
     </div>
@@ -81,6 +87,7 @@
             unitConverter: 'd',
             hrClassifier: 'f',
             numberMode: 'g',
+            searchMenu: 'w',
             inputBack: 'q',
             inputForward: 'e'
         };
@@ -106,6 +113,9 @@ answers separated by commas.
 Sometimes a value will be NaN, which stands for Not a Number. This does not necessarily
 mean that there was a bug in the code - it could mean a domain error (ie eccentricity was
 negative).
+To open the search menu, press the Search Equations button. A menu will pop up with
+an input field. Putting units separated by semicolons and then pressing the search
+button will allow you to search all solvers with those exact units.
 To open a unit converter, press the Convert Units button. A menu will pop up where
 you can fill out a value, its unit, and a unit to convert to. Pressing convert
 will then convert that value you inputted. Pressing the Convert Units button again
@@ -149,6 +159,7 @@ the input's value and unit will be automatically filled out in the unit converte
 Press ${keybinds.hrClassifier} to open the HR classifier menu.
 Press ${keybinds.inputBack} and ${keybinds.inputForward} to switch between inputs of the same solver.
 Press ${keybinds.numberMode} to switch between default, exact, and scientific number display.
+Press ${keybinds.searchMenu} to open the search menu.
         `.trim().replaceAll('\n', '<br>');
 
         const conversionErrors = {
@@ -2181,6 +2192,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             // create a div to hold the new solver
             const solver = document.createElement('div');
             solver.category = categories.map(v => v.replaceAll(' ', ''));
+            solver.units = units;
             solver.style.display = 'block';
             solver.id = name;
 
@@ -2359,6 +2371,61 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
                 hrClassifier.children[hrClassifier.children.length - 4].style.display = 'none';
                 hrClassifier.children[hrClassifier.children.length - 1].clear();
+
+                document.querySelector('#searchMenu>input').value = '';
+                document.querySelector('#searchMenu>span').clear();
+            };
+
+            // search button
+            const searchMenu = document.querySelector('#searchMenu');
+            searchMenu.style.display = 'none';
+            const searchInput = document.querySelector('#searchMenu>input');
+            searchInput.textInputRequired = true;
+
+            const searchError = document.querySelector('#searchMenu>span');
+            searchError.style.display = 'none';
+            searchError.style.fontSize = 10;
+            searchError.style.color = 'red';
+            searchError.throw = message => {
+                searchError.style.display = 'block';
+                searchError.innerHTML = message;
+            };
+            searchError.clear = message => searchError.style.display = 'none';
+
+            const searchForButton = document.querySelector('#searchMenu>button');
+            searchForButton.onclick = () => {
+                searchError.clear();
+                try {
+                    const unitsToSearch = searchInput.value.split(';').map(unit => convertUnitToSI(parseUnit(unit)).unit);
+                
+                    for (let solver of equationSolver.children) {
+                        try {
+                            solver.style.display = 'none';
+                            const units = solver.units.map(unit => convertUnitToSI(parseUnit(unit)).unit);
+                            
+                            if (units.length < unitsToSearch.length) continue;
+                            if (unitsToSearch.every(unit => units.find(v => v.every((_, i) => unit[i] == v[i])))) solver.style.display = 'block';
+                        } catch (e) {if (!Object.values(conversionErrors).includes(Number(e.message))) searchError.throw(`Code Error<br>${e}`);}
+                    }
+
+                    searchInput.blur();
+                } catch (e) {
+                    if (e.message == conversionErrors.factorNotFound) searchError.throw('Conversion factor not found.');
+                    else if (e.message == conversionErrors.prefixNotFound) searchError.throw('Unit prefix not found.');
+                    else if (e.message == conversionErrors.conversionNotPossible) searchError.throw('Conversion is not possible.');
+                    else searchError.throw(`Code Error<br>${e}`);
+                }
+            };
+
+            const searchButton = document.createElement('button');
+            searchButton.innerHTML =  'Search Equations';
+            searchButton.open = false;
+            searchButton.onclick = () => {
+                searchButton.open = !searchMenu.open;
+                if (searchMenu.style.display == 'none') {
+                    searchMenu.style.display = 'block';
+                    searchInput.focus();
+                } else searchMenu.style.display = 'none';
             };
 
             // unit converter button
@@ -2451,6 +2518,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             toolbar.appendChild(mainMenuButton);
             toolbar.appendChild(clearAllButton);
+            toolbar.appendChild(searchButton);
+            toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(unitConverterButton);
             toolbar.appendChild(hrClassifierButton);
             toolbar.appendChild(document.createElement('br'));
@@ -2463,7 +2532,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             toolbar.appendChild(keyboardShortcuts);
 
             // return mainMenu and clearAll onclick functions
-            return {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton};
+            return {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, searchButton};
         }
 
         // generates the unit converter menu
@@ -2692,7 +2761,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         function generateKeybinds(toolbarButtons) {
-            const {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton} = toolbarButtons;
+            const {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, searchButton} = toolbarButtons;
 
             body.addEventListener('keydown', event => {
                 // function that prevents the normal keypress from happening
@@ -2704,6 +2773,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         unitConverter.children[unitConverter.children.length - 2].onclick();
                     else if (hrClassifierButton.open)
                         hrClassifier.children[hrClassifier.children.length - 5].onclick();
+                    else if (searchButton.open)
+                        document.querySelector('#searchMenu>button').onclick();
                     else {
                         for (let i = 0; i < equationSolver.children.length; i++) {
                             if (equationSolver.children[i].style.display != 'block') continue;
@@ -2725,6 +2796,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 if (event.key.toLowerCase() == keybinds.mainMenu) deleteDefault(mainMenuButton.onclick());
                 // add a keybind where s will clear all values
                 else if (event.key.toLowerCase() == keybinds.clearAll) deleteDefault(clearAllButton.onclick());
+                // add a keybind where w will open the equation search menu
+                else if (event.key.toLowerCase() == keybinds.searchMenu) deleteDefault(searchButton.onclick());
                 // add a keybind to switch the number representation mode
                 else if (event.key.toLowerCase() == keybinds.numberMode) deleteDefault((function() {
                     const currentIndex = numberModes.findIndex(v => v == numberMode);

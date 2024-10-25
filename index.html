@@ -2430,7 +2430,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             searchButton.innerHTML =  'Search Equations';
             searchButton.open = false;
             searchButton.onclick = () => {
-                searchButton.open = !searchMenu.open;
+                searchButton.open = !searchButton.open;
                 if (searchMenu.style.display == 'none') {
                     searchMenu.style.display = 'block';
                     searchInput.focus();

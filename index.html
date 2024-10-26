@@ -35,11 +35,25 @@
 
         #currentNumberMode {
             position: fixed;
-            right: 0%;
             top: 0%;
+            right: 0%;
 
             padding: 1em;
             margin: 1em;
+
+            border: 1px solid black;
+            background-color: white;
+        }
+
+        #followMouse {
+            position: fixed;
+            top: 0px;
+            left: 0px;
+
+            padding: 1em;
+            margin: 1em;
+
+            display: none;
 
             border: 1px solid black;
             background-color: white;
@@ -79,6 +93,8 @@
         <button id="importButton">import</button>
         <button id="importCancel">cancel</button>
     </div>
+
+    <div id="followMouse"></div>
 
     <script>
         const keybinds = {
@@ -2149,17 +2165,21 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             // the function created returns a list of all the
             // possible solutions for the case that you need
             // to solve for that one variable.
+            const rawEquations = [];
             const equations = [];
-            for (let i = 0; i < variables.length; i++) equations[i] = new Function(...variables.filter((_, j) => i != j), `return [${buffer.next().value}];`);
+            for (let i = 0; i < variables.length; i++) {
+                rawEquations[i] = buffer.next().value;
+                equations[i] = new Function(...variables.filter((_, j) => i != j), `return [${rawEquations[i]}];`);
+            }
 
             // returns them all as a object
-            return {name, categories, variables, units, descriptions, equations};
+            return {name, categories, variables, units, descriptions, rawEquations, equations};
         }
 
         // generates all the buttons and solvers that you see from a compiled equation
         function generateEquationHTML(compiled) {
             // get necessary variables
-            const {name, categories, variables, units, descriptions, equations} = compiled;
+            const {name, categories, variables, units, descriptions, rawEquations, equations} = compiled;
 
             // create a button that when pressed will hide all equation solvers except
             // the one that shares a name with the button
@@ -2216,7 +2236,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const longestDescriptionLength = Math.max(minimumInputSize, Math.max(...descriptions.map((_, i) => descriptions[i].length + units[i].length + 2)));
             for (let i = 0; i < variables.length; i++) {
                 const input = document.createElement('input');
-                input.title = input.placeholder = `${descriptions[i]}`;
+                input.placeholder = `${descriptions[i]}`;
+                input.hoverText = `${descriptions[i]} (${units[i]})<br>${variables[i]} = ${rawEquations[i]}`;
                 input.isSolverInput = true;
                 input.size = longestDescriptionLength;
                 input.unit = units[i];
@@ -2224,7 +2245,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 const unitInput = document.createElement('input');
                 unitInput.placeholder = `${units[i]}`;
                 unitInput.textInputRequired = true;
-                unitInput.size = 10;
+                unitInput.size = 17;
                 
                 inputElements.push(input);
                 unitInputElements.push(unitInput);
@@ -2583,22 +2604,24 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const convertButton = document.createElement('button');
             convertButton.innerHTML = 'convert';
             convertButton.onclick = () => {
+                const toNumber = string => new Function(`return ${string}`)();
+
                 error.style.display = 'none';
                 try {
                     if (input1.value == '' && input2.value == '') error.throw('Cannot convert nothing.');
                     else if (input1.value == '') {
-                        input1.value = numberMode(convertUnit(Number(input2.value), unit2.value, unit1.value));
+                        input1.value = numberMode(convertUnit(toNumber(input2.value), unit2.value, unit1.value));
                         input1.focus();
                     } else if (input2.value == '') {
-                        input2.value = numberMode(convertUnit(Number(input1.value), unit1.value, unit2.value));
+                        input2.value = numberMode(convertUnit(toNumber(input1.value), unit1.value, unit2.value));
                         input2.focus();
                     } else if (document.activeElement.isConverter) {
                         document.activeElement.value = '';
                         if (input1.value == '') {
-                            input1.value = numberMode(convertUnit(Number(input2.value), unit2.value, unit1.value));
+                            input1.value = numberMode(convertUnit(toNumber(input2.value), unit2.value, unit1.value));
                             input1.focus();
                         } else if (input2.value == '') {
-                            input2.value = numberMode(convertUnit(Number(input1.value), unit1.value, unit2.value));
+                            input2.value = numberMode(convertUnit(toNumber(input1.value), unit1.value, unit2.value));
                             input2.focus();
                         }
                     } else {
@@ -2630,11 +2653,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             hrClassifier.appendChild(header);
 
             const typeInput = document.createElement('input')
-            typeInput.title = typeInput.placeholder = 'Stellar Classification';
+            typeInput.hoverText = typeInput.placeholder = 'Stellar Classification';
             typeInput.textInputRequired = true;
             typeInput.unit = specialUnits.none;
             typeInput.size = 50;
-            typeInput.onchange = () => typeInput.title = starClassText(typeInput.value) ?? '';
+            typeInput.onchange = () => typeInput.hoverText = starClassText(typeInput.value) ?? '';
 
             hrClassifier.appendChild(typeInput);
             hrClassifier.appendChild(document.createElement('br'));
@@ -2645,7 +2668,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                 const newInput = document.createElement('input');
                 newInput.unit = specialUnits[split[1]] ?? split[1];
-                newInput.title = newInput.placeholder = split[0];
+                newInput.placeholder = split[0];
+                newInput.hoverText = `${split[0]} (${split[1]})`;
                 newInput.isSolverInput = true;
                 newInput.size = 50;
                 inputs.push(newInput);
@@ -2666,7 +2690,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             const colorInput = document.createElement('input');
             colorInput.type = 'color';
-            colorInput.onchange = () => colorInput.title = `rgb(${hexToRGB(colorInput.value).join(', ')})`; colorInput.onchange();
+            colorInput.onchange = () => colorInput.hoverText = `rgb(${hexToRGB(colorInput.value).join(', ')})`; colorInput.onchange();
             colorInput.style.width = '64ch';
             hrClassifier.appendChild(colorInput);
             hrClassifier.appendChild(document.createElement('br'));
@@ -2769,6 +2793,20 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             };
         }
 
+        function generateOnHover() {
+            const followMouse = document.querySelector('#followMouse');
+
+            window.addEventListener('mousemove', event => {
+                followMouse.style.left = event.clientX + 'px';
+                followMouse.style.top = event.clientY + 'px';
+
+                if (event.target.hoverText) {
+                    followMouse.style.display = 'block';
+                    followMouse.innerHTML = event.target.hoverText;
+                } else followMouse.style.display = 'none';
+            });
+        }
+
         function generateKeybinds(toolbarButtons) {
             const {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, searchButton} = toolbarButtons;
 
@@ -2857,6 +2895,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const mainButton = document.getElementsByClassName('Main')[0];
             mainButton.innerHTML = 'Go to Main Menu';
             equationSelector.removeChild(mainButton);
+
+            // generates the thing that appears when you hover over stuff
+            generateOnHover();
 
             // generate the unit converter
             generateUnitConverter();

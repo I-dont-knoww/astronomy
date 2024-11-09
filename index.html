@@ -2240,6 +2240,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 input.placeholder = `${descriptions[i]}`;
                 input.hoverText = `${descriptions[i]} (${units[i]})<br>${variables[i]} = ${rawEquations[i]}`;
                 input.isSolverInput = true;
+                input.holder = solver;
                 input.size = longestDescriptionLength;
                 input.unit = units[i];
 
@@ -2828,6 +2829,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     else {
                         for (let i = 0; i < equationSolver.children.length; i++) {
                             if (equationSolver.children[i].style.display != 'block') continue;
+                            if (document.activeElement.holder && document.activeElement.holder != equationSolver.children[i]) continue;
 
                             equationSolver.children[i].children[equationSolver.children[i].children.length - 2].onclick();
                         }

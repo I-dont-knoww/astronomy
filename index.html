@@ -10,7 +10,7 @@
             box-sizing: border-box;
         }
 
-        h1, h2, h3, h4, h5, h6, div, button, span, input {
+        h1, h2, h3, h4, h5, h6, div, button, span, p, input {
             font-family: monospace;
         }
 
@@ -87,6 +87,7 @@
         <button>search</button><br>
         <span></span>
     </div>
+    <br><br><br><br><br><br><br><br>
     <div id="currentNumberMode">
         <span>Current Number Mode: <b id="currentNumberModeText">Default</b></span>
     </div>
@@ -251,6 +252,7 @@ d: 1e-1
 Inward Gravitation
 Gravity
 FMpAdr
+F_g;M;ρ;A;d_r;r
 N;kg;kg/m^3;m^2;m;m
 F: force of gravitation
 M: mass of object excluding layer
@@ -268,6 +270,7 @@ r: total radius
 Gravitational Acceleration (Simple)
 Gravity
 Amr
+A_g;m;r
 m/s^2;m;m
 AG: gravitation acceleration
 m: mass of object
@@ -279,6 +282,7 @@ r: radius of object
 Escape Velocity
 Velocity
 vMr
+v_e;M;r
 m/s;kg;m
 ve: escape velocity
 M: mass of object being escaped from
@@ -290,6 +294,7 @@ r: distance from center of mass of object being escaped from
 Orbital Velocity (Mass and Distance)
 Velocity;Orbital Velocity
 vMr
+v;M;r
 m/s;kg;m
 v: orbital velocity
 M: mass of object being orbited
@@ -301,6 +306,7 @@ r: distance from object to center of mass of object being orbited
 Orbital Velocity [Approximation] (Semi-Major Axis and Orbital Period)
 Velocity;Orbital Velocity
 vaT
+v;a;T
 m/s;m;s
 v: orbital velocity
 a: length of semi-major axis
@@ -312,8 +318,9 @@ T: orbital period
 Aphelion Velocity
 Velocity;Orbital Velocity
 vMae
+v;M;a;e
 m/s;kg;m;none
-v: aphelion velocity
+v_a: aphelion velocity
 M: mass of star
 a: semi-major axis
 e: eccentricity
@@ -325,6 +332,7 @@ e: eccentricity
 Perihelion Velocity
 Velocity;Orbital Velocity
 vMae
+v_p;M;a;e
 m/s;kg;m;none
 v: perihelion velocity
 M: mass of star
@@ -338,6 +346,7 @@ e: eccentricity
 Gravitational Potential Energy (Between Two Objects)
 Gravity;Gravitational Potential Energy
 Uabr
+U_g;a;b;r
 J;kg;kg;m
 U: gravitational potential energy
 m1: mass of object 1
@@ -351,6 +360,7 @@ r: distance between objects
 Gravitational Potential Energy (Single Body)
 Gravity;Gravitational Potential Energy
 UMR
+U_g;M;R
 J;kg;m
 U: gravitational potential energy
 M: mass of body
@@ -362,6 +372,7 @@ R: radius of object
 Virial Theorem (Gravitational Potential Energy and Total Kinetic Energy)
 Virial Theorem
 UT
+U_g;T
 J;J
 U: gravitational potential energy
 T: total kinetic energy
@@ -371,6 +382,7 @@ U / (-2)
 Virial Theorem (Galaxy)
 Virial Theorem
 MvR
+M;v;R
 kg;m/s;m
 M: mass of galaxy
 v: total velocity including velocity dispersion and rotation
@@ -382,6 +394,7 @@ R: radius of galaxy
 Kepler's Third (Simple)
 Kepler's Laws
 paM
+p;a;M
 yr;au;Ms
 p: orbital period
 a: length of semi-major axis
@@ -393,6 +406,7 @@ M: mass of central object
 Kepler's Third (General)
 Kepler's Laws
 PABa
+P;M_1;M_2;a
 s;kg;kg;m
 P: orbital period
 M1: mass of first body
@@ -406,6 +420,7 @@ a: semi-major axis
 Kepler's First
 Kepler's Laws
 raet
+r;a;e;θ
 au;au;none;rad
 r: distance to star
 a: semi-major axis
@@ -419,6 +434,7 @@ acos((a * (1 - (e ** 2)) - r) / (e * r)), 2 * PI - acos((a * (1 - (e ** 2)) - r)
 Binary Systems (Mass and Distance from Barycenter)
 Binary Systems
 MmRr
+m_a;m_b;r_a;r_b
 any;same;any;same
 ma: mass of object a
 mb: mass of object b
@@ -432,6 +448,7 @@ rb: distance from barycenter to object b
 Binary Systems (Orbital Velocity and Distance from Barycenter)
 Binary Systems
 VvRr
+v_a;v_b;r_a;r_b
 any;same;any;same
 va: orbital velocity of object a
 vb: orbital velocity of object b
@@ -445,6 +462,7 @@ rb: distance from barycenter to object b
 Binary Systems (Distance from Barycenter, Mass, and Distance between Both Bodies)
 Binary Systems
 raMm
+r;a;m_1;m_2
 any;same;any;same
 r: distance from m1 to barycenter
 a: distance between both bodies
@@ -458,6 +476,7 @@ r * ((M + m) / m)
 Binary Mass Function (Mass of Objects and Inclination Angle)
 Binary Systems;Binary Mass Function
 fMmi
+f;M_1;M_2;i
 kg;kg;kg;rad
 f: maximum possible combined mass of binary system
 M1: mass of first object
@@ -471,6 +490,7 @@ asin(((f * (M ** 2 + 2 * M * m + m ** 2)) / (m ** 3)) ** (1/3)), PI - asin(((f *
 Binary Mass Function (Orbital Period, Maximum Radial Velocity, and Eccentricity)
 Binary Systems;Binary Mass Function
 fPKe
+f;P_orb;K;e
 kg;s;m/s;none
 f: maximum possible combined mass of binary system
 P: orbital period
@@ -484,6 +504,7 @@ e: eccentricity
 Distance Mod
 Magnitude and Luminosity
 dMm
+d;M_v;m_v
 pc;none;none
 d: distance to object
 Mv: absolute magnitude
@@ -495,6 +516,7 @@ M - 5 + (5 * log(d))
 Pogson's Formula
 Magnitude and Luminosity
 mIi
+m1-m2;I_1;I_2 
 none;any;same
 m1 - m2: difference in apparent magnitude
 I1: intensity of object 1
@@ -506,6 +528,7 @@ I / (10 ** (m / (100 ** 0.2)))
 Period-Luminosity Relationship of Cepheid Variables
 Magnitude and Luminosity
 MP
+M_v;P
 none;day
 Mv: absolute magnitude of cepheid variable
 P: period of cepheid variable in days
@@ -515,6 +538,7 @@ P: period of cepheid variable in days
 Luminosity and Absolute Magnitude
 Magnitude and Luminosity
 LM
+L;M
 W;none
 L: luminosity of object
 M: absolute magnitude of object
@@ -524,6 +548,7 @@ M: absolute magnitude of object
 Parallax
 Main
 Dp
+D;p
 pc;arcsec
 D: distance
 p: parallax angle
@@ -533,6 +558,7 @@ p: parallax angle
 Small Angle (Arcseconds)
 Small Angle
 tdD
+θ;d;D
 arcsec;any;same
 θ: angle
 d: diameter of distant object
@@ -544,6 +570,7 @@ t * D / 206265
 Small Angle (Radians)
 Small Angle
 tdD
+θ;d;D
 rad;any;same
 θ: angle
 d: diameter of distant object
@@ -555,6 +582,7 @@ d / t
 Redshift (Radial Velocity)
 Redshift
 Vsr
+V_r;Δλ;λ
 m/s;any;same
 Vr: radial velocity
 Δλ: wavelength shift
@@ -566,6 +594,7 @@ s / V * c
 Tangential Velocity
 Velocity
 Vmp
+V_tang;μ;p
 m/s;arcsec/yr;arcsec
 Vtang: tangential velocity
 μ: proper motion
@@ -577,6 +606,7 @@ V * p / 4.75
 Redshift (Simple Recessional Velocity)
 Redshift
 zv
+z;v
 none;m/s
 z: redshift
 v: recessional velocity
@@ -586,6 +616,7 @@ z * c
 Redshift (Relativistic Recessional Velocity)
 Redshift
 zv
+z;v
 none;m/s
 z: redshift
 v: recessional velocity
@@ -595,6 +626,7 @@ v: recessional velocity
 Redshift (Wavelength Shift and Rest Wavelength)
 Redshift
 zsr
+z;Δλ;λ
 none;any;same
 z: redshift
 Δλ: wavelength shift
@@ -606,6 +638,7 @@ s / z
 Redshift (Observed and Emitted Wavelength)
 Redshift
 zoe
+z;λ_observed;λ_emitted
 none;any;same
 z: redshift
 λobserved: observed wavelength
@@ -617,6 +650,7 @@ o / (z + 1)
 Hubble's Law
 Hubble
 vhd
+v;H_0;d
 km/s;km/s*Mpc;Mpc
 v: recessional velocity
 H0: hubble's constant
@@ -628,24 +662,27 @@ v / h
 Hubble Age
 Hubble
 tH
+t;H_0
 s*Mpc/km;km/s*Mpc
 t: hubble time
-H: hubble's constant
+H0: hubble's constant
 1/H
 1/t
 \\
 Age of Universe from Hubble Constant
 Hubble
 tH
+t;H_0
 Gyr;km/s*Mpc
 t: age of universe
-H: hubble's constant
-1/H * 10 ** 3
-1/t * (10 ** 3)
+H0: hubble's constant
+(1/H) * 10 ** 3
+(1/t) * (10 ** 3)
 \\
 Light Intensity
 Main
 ILd
+I;L;d
 W/m^2;W;m
 I: light intensity
 L: luminosity
@@ -657,6 +694,7 @@ L / (4 * PI * (d ** 2))
 Mass Luminosity [Approximation]
 Stars
 ML
+M;L
 Ms;Ls
 M: mass of star
 L: luminosity of star
@@ -666,15 +704,17 @@ M ** 3.5
 Bolometric Magnitude
 Magnitude and Luminosity;Magnitude
 ML
+M_bol;L
 none;W
-M: bolometric magnitude
+Mbol: bolometric magnitude
 L: luminosity
 4.75 - 2.5 * log(L / solarLum)
-(10 ** ((M - 4.75) / -2.5)) * solarLum
+(10 ** ((M - 4.75) / (-2.5))) * solarLum
 \\
 Visual Band Magnitude
 Magnitude and Luminosity;Magnitude
 VBC
+M_v;M_bol;BC
 none;none;none
 Mv: visual band magnitude
 Mbol: bolometric magnitude
@@ -686,6 +726,7 @@ B - V
 BV Index
 Magnitude and Luminosity;Magnitude
 iBV
+B-V;M_b;M_v
 none;none;none
 B-V: B-V index
 Mb: blue band magnitude
@@ -697,6 +738,7 @@ B - i
 Stefan-Boltzmann (Flux and Temperature)
 Stefan-Boltzmann
 FT
+F;T
 W/m^2;K
 F: flux
 T: temperature
@@ -706,6 +748,7 @@ SB * T ** 4
 Stefan-Boltzmann (Luminosity, Radius, and Temperature)
 Stefan-Boltzmann
 LRT
+L;R;T
 W;m;K
 L: luminosity
 R: radius
@@ -717,8 +760,9 @@ T: temperature
 Wien
 Main
 lT
+λ_peak;T
 m;K
-λ: peak wavelength
+λpeak: peak wavelength
 T: temperature
 b / T
 b / l
@@ -726,6 +770,7 @@ b / l
 Ballesteros
 Stars
 Ti
+T;B-V
 K;none
 T: temperature
 B-V: BV index
@@ -735,6 +780,7 @@ quad1(0.8464 * T, 2.1344 * T - 8464, 1.054 * T - 10672), quad2(0.8464 * T, (2.13
 Mass Energy
 Main
 Em
+E;m
 J;kg
 E: energy
 m: mass
@@ -744,6 +790,7 @@ E / (c ** 2)
 Ideal Gas Pressure
 Pressure
 PnT
+P;n;T
 N/m^2;#/m^3;K
 P: pressure of gas
 n: # of particles
@@ -755,15 +802,17 @@ P / (kB * n)
 Radiation Pressure
 Pressure
 PT
+P;T
 J/m^2;K
 P: pressure
 T: temperature
 (1/3) * a * T ** 4
-(3 * P / a) ** 0.25
+(3 * (P / a)) ** 0.25
 \\
 Schwarzschild Radius
 Black Holes
 rM
+r_s;M
 m;kg
 rS: schwarzschild radius
 M: mass
@@ -773,6 +822,7 @@ M: mass
 ISCO (Schwarzschild Radius)
 Black Holes
 rS
+r_ms;r_S
 m;m
 rms: radius of innermost stable circular orbit
 rS: schwarzschild radius
@@ -782,6 +832,7 @@ r / 3
 ISCO (Mass)
 Black Holes
 rM
+r_ms;M
 m;kg
 rms: radius of inner most stable circular orbit
 M: mass of object
@@ -791,15 +842,17 @@ M: mass of object
 Photon Sphere (Schwarzschild Radius)
 Black Holes
 rS
+r_ph;r_S
 m;m
 rph: radius of photon sphere
 rS: schwarzschild radius
-S * 1.5
+1.5 * S
 r / 1.5
 \\
 Photon Sphere (Mass)
 Black Holes
 rM
+r_ph;M
 m;kg
 rph: radius of photon sphere
 M: mass of object
@@ -809,6 +862,7 @@ M: mass of object
 Transit Depth
 Exoplanets
 drR
+δ;R_planet;R_star
 none;any;same
 δ: transit depth
 Rplanet: radius of exoplanet
@@ -820,6 +874,7 @@ r / (d ** 0.5)
 Equilibrium Temperature
 Exoplanets
 tTARD
+T_p;T_☉;A;R☉;D
 K;K;none;m;m
 Tp: temperature of planet
 T☉: temperature of star
@@ -835,6 +890,7 @@ t / (((1 - A) ** 0.25) * ((R / (2 * D)) ** 0.5))
 Tully-Fisher
 Main
 LlVv
+L_1;L_2;v_1;v_2
 any;same;any;same
 L1: luminosity of one galaxy
 L2: luminosity of other galaxy
@@ -2107,35 +2163,40 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             };
         }
 
-        // parses the operators ex. a + b --> {type: 'operator', operator: '+', left: 'a', right: 'b'}
+        // parses the operators and puts them into a tree thing
         function parseOperators(string) {
             string = removeUnnecessaryParenthesis(string);
 
-            const operators = ['+', '-', '*', '/', '^'];
             if (isStringFunction(string)) return parseStringFunction(string);
             if (!/\+|\-|\*|\/|\^/.test(string)) return string;
 
-            for (let i = 0; i < string.length; i++) {
-                if (string[i] == '(')
-                    i = findClosingParenthesis(string, i);
-                else if (operators.includes(string[i])) return {
-                    type: 'operator',
-                    operator: string[i],
-                    left: parseOperators(string.slice(0, i)),
-                    right: parseOperators(string.slice(i + 1))
-                };
+            const operators = [['^'], ['*', '/'], ['+', '-']];
+            for (let order of operators.toReversed()) {
+                const operatorsUsed = [];
+                let sections = string;
+
+                for (let i = 0; i < string.length; i++) {
+                    if (string[i] == '(')
+                        i = findClosingParenthesis(string, i);
+                    else if (order.includes(string[i])) {
+                        operatorsUsed.push(string[i]);
+                        sections = sections.slice(0, i) + '@' + sections.slice(i + 1);
+                    }
+                }
+
+                if (operatorsUsed.length > 0) {
+                    return {
+                        sections: sections.split('@').map(section => parseOperators(section)),
+                        operators: operatorsUsed,
+                        type: 'operator'
+                    };
+                }
             }
-            return string;
         }
 
         // parses the string
         function parseStringExpression(string) {
-            const specialCharacters = {
-                PI: 'π'
-            };
-
             string = string.replaceAll(' ', '').replaceAll('**', '^');
-            Object.keys(specialCharacters).forEach(character => string = string.replaceAll(character, specialCharacters[character]));
 
             let depth = 0;
             for (let i = 0; i < string.length; i++) {
@@ -2151,7 +2212,28 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             return expressions.map(expression => parseOperators(expression));
         }
 
-        function branchToMathML(branch) {
+        function variableToMathML(variable) {
+            const createElement = type => document.createElementNS('http://www.w3.org/1998/Math/MathML', type);
+
+            const split = variable.split('_');
+            if (split.length > 1) {
+                const root = createElement('msub');
+
+                root.appendChild(createElement('mi')).appendChild(document.createTextNode(split[0]));
+                root.appendChild(createElement(isNaN(split[1]) ? 'mi' : 'mn')).appendChild(document.createTextNode(split[1]));
+
+                root.type = 'number';
+                return root;
+            } else {
+                const root = createElement('mi');
+                root.appendChild(document.createTextNode(split[0]));
+                
+                root.type = 'number';
+                return root;
+            }
+        }
+
+        function branchToMathML(branch, variableNames) {
             const createElement = type => document.createElementNS('http://www.w3.org/1998/Math/MathML', type);
 
             if (branch.type == 'operator') {
@@ -2164,59 +2246,63 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     root.type = element.type;
                     return root;
                 };
-                const {left, right, operator} = branch;
 
-                if (operator == '/') {
-                    const fraction = createElement('mfrac');
-                    fraction.appendChild(branchToMathML(left));
-                    fraction.appendChild(branchToMathML(right));
+                const {sections, operators} = branch;
+                const mathMLSections = sections.map(section => branchToMathML(section, variableNames));
 
-                    fraction.type = '^';
-                    return fraction;
-                } else if (operator == '^') {
-                    // roots are super long when using capital letters for some reason
-                    const power = createElement('msup');
+                const operatorSymbols = {
+                    '+': '+',
+                    '-': '-',
+                };
+                const specialOperators = {
+                    '/': 'mfrac',
+                    '^': 'msup'
+                };
+                const needsParenthesis = {
+                    '+': [],
+                    '-': [],
+                    '*': ['terms', 'fraction'],
+                    '/': [],
+                    '^': ['terms', 'multiplication', 'fraction', 'exponentiation']
+                };
 
-                    let leftElement = branchToMathML(left);
-                    let rightElement = branchToMathML(right);
+                const root = createElement('mrow');
 
-                    if (leftElement.type != 'number') leftElement = surroundWithParenthesis(leftElement);
+                let currentRoot = root;
+                for (let i = 0; i < mathMLSections.length - 1; i++) {
+                    if (operators[i] in specialOperators) {
+                        const newRoot = createElement(specialOperators[operators[i]]);
+                        currentRoot.appendChild(newRoot);
+                        currentRoot = newRoot;
+                    }
 
-                    power.appendChild(leftElement);
-                    power.appendChild(rightElement);
+                    if (needsParenthesis[operators[i]].includes(mathMLSections[i].type)) mathMLSections[i] = surroundWithParenthesis(mathMLSections[i]);
+                    if (mathMLSections[i].type == 'fraction') root.type = 'fraction';
+                    currentRoot.appendChild(mathMLSections[i]);
 
-                    power.type = '^';
-                    return power;
-                } else if (operator == '*') {
-                    const root = createElement('mrow');
-
-                    let leftElement = branchToMathML(left);
-                    let rightElement = branchToMathML(right);
-
-                    if (leftElement.type == '+' || leftElement.type == '-') leftElement = surroundWithParenthesis(leftElement);
-                    if (rightElement.type == '+' || rightElement.type == '-') rightElement = surroundWithParenthesis(rightElement);
-
-                    root.appendChild(leftElement);
-                    root.appendChild(rightElement);
-
-                    root.type = '*';
-                    return root;
-                } else {
-                    const root = createElement('mrow');
-                    root.appendChild(branchToMathML(left));
-                    root.appendChild(createElement('mo')).appendChild(document.createTextNode(operator));
-                    root.appendChild(branchToMathML(right));
-
-                    root.type = operator;
-                    return root;
+                    if (!(operators[i] in specialOperators))
+                        if (operatorSymbols[operators[i]]) currentRoot.appendChild(createElement('mo')).appendChild(document.createTextNode(operatorSymbols[operators[i]]));
                 }
+                const length = mathMLSections.length;
+                if (needsParenthesis[operators[length - 2]].includes(mathMLSections[length - 1].type))
+                    mathMLSections[length - 1] = surroundWithParenthesis(mathMLSections[length - 1]);
+                currentRoot.appendChild(mathMLSections[length - 1]);
+
+                const allOperators = operators.join('');
+                if (!root.type) {
+                    if (/[\+\-]/.test(allOperators)) root.type = 'terms';
+                    else if (/\//.test(allOperators)) root.type = 'fraction';
+                    else if (/\*/.test(allOperators)) root.type = 'multiplication';
+                    else if (/\^/.test(allOperators)) root.type = 'exponentiation';
+                }
+                return root;
             } else if (branch.type == 'function') {
                 const functionElement = createElement('mrow');
                 functionElement.appendChild(createElement('mi')).appendChild(document.createTextNode(branch.name));
                 functionElement.appendChild(createElement('mo')).appendChild(document.createTextNode('('));
 
                 for (let input of branch.inputs) {
-                    functionElement.appendChild(branchToMathML(input));
+                    functionElement.appendChild(branchToMathML(input, variableNames));
                     functionElement.appendChild(createElement('mo')).appendChild(document.createTextNode(','));
                 }
                 functionElement.removeChild(functionElement.lastChild);
@@ -2225,27 +2311,33 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 functionElement.type = 'function';
                 return functionElement;
             } else {
-                const element = createElement(isNaN(branch) ? 'mi' : 'mn');
-                element.innerHTML = branch;
+                const specialCharacters = {
+                    PI: 'π',
+                    SB: 'σ',
+                    kB: 'k_B',
+                    E: 'e',
+                    solarLum: 'L_⊙',
+                    solarMag: 'M_⊙',
+                    solarRad: 'R_⊙'
+                };
 
-                element.type = 'number';
-                return element;
+                return variableToMathML(variableNames[branch] ?? specialCharacters[branch] ?? branch);
             }
         }
 
         // turns the tree into MathML
-        function treeToMathML(header, tree) {
+        function treeToMathML(header, variableNames, tree) {
             const createElement = type => document.createElementNS('http://www.w3.org/1998/Math/MathML', type);
 
             const root = createElement('math');
-            root.setAttribute('font-family', 'serif');
+            root.style.fontSize = '1em';
             root.setAttribute('display', 'block');
 
-            root.appendChild(createElement('mi')).appendChild(document.createTextNode(header));
+            root.appendChild(variableToMathML(variableNames[header]));
             root.appendChild(createElement('mo')).appendChild(document.createTextNode('='));
 
             for (let branch of tree) {
-                root.appendChild(branchToMathML(branch));
+                root.appendChild(branchToMathML(branch, variableNames));
                 root.appendChild(createElement('mo')).appendChild(document.createTextNode(','));
             }
             root.removeChild(root.lastChild);
@@ -2351,6 +2443,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const name = buffer.next().value;
             const categories = buffer.next().value.split(';');
             const variables = buffer.next().value.split('');
+            const variableNames = Object.fromEntries(buffer.next().value.split(';').map((v, i) => [variables[i], v]));
             const units = buffer.next().value.split(';').map(v => specialUnits[v] || v);
 
             // gets the variable descriptions
@@ -2373,13 +2466,13 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             }
 
             // returns them all as a object
-            return {name, categories, variables, units, descriptions, rawEquations, equations};
+            return {name, categories, variables, variableNames, units, descriptions, rawEquations, equations};
         }
 
         // generates all the buttons and solvers that you see from a compiled equation
         function generateEquationHTML(compiled) {
             // get necessary variables
-            const {name, categories, variables, units, descriptions, rawEquations, equations} = compiled;
+            const {name, categories, variables, variableNames, units, descriptions, rawEquations, equations} = compiled;
 
             // create a button that when pressed will hide all equation solvers except
             // the one that shares a name with the button
@@ -2441,7 +2534,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 input.hoverText.appendChild(document.createElement('span')).appendChild(document.createTextNode(`${descriptions[i]} (${units[i]})`));
                 input.hoverText.appendChild(document.createElement('br'));
                 input.hoverText.appendChild(document.createElement('br'));
-                input.hoverText.appendChild(treeToMathML(variables[i], parseStringExpression(rawEquations[i])));
+                input.hoverText.appendChild(treeToMathML(variables[i], variableNames, parseStringExpression(rawEquations[i])));
                 input.isSolverInput = true;
                 input.holder = solver;
                 input.size = longestDescriptionLength;
@@ -2703,7 +2796,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     unitConversionsRaw = importText.value.trim();
                     unitConversions = parseUnitConversions(unitConversionsRaw);
 
-                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = '';
+                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = hrClassifier.innerHTML = '';
                     generateAllHTMLs(compileAllEquations(equations));
                     resetImport();
 
@@ -2722,7 +2815,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 importButton.onclick = () => {
                     equations = (new Function(`return \`${importText.value}\``))().trim();
 
-                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = '';
+                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = hrClassifier.innerHTML = '';
                     generateAllHTMLs(compileAllEquations(equations));
                     resetImport();
 

@@ -2130,7 +2130,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
         // parses the string
         function parseStringExpression(string) {
+            const specialCharacters = {
+                PI: 'π'
+            };
+
             string = string.replaceAll(' ', '').replaceAll('**', '^');
+            Object.keys(specialCharacters).forEach(character => string = string.replaceAll(character, specialCharacters[character]));
 
             let depth = 0;
             for (let i = 0; i < string.length; i++) {

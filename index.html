@@ -8,6 +8,9 @@
     <style>
         * {
             box-sizing: border-box;
+        }
+
+        h1, h2, h3, h4, h5, h6, div, button, span, input {
             font-family: monospace;
         }
 
@@ -2053,6 +2056,197 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             })[classification]})(starClass.slice(0, index), starClass[index], type[starClass.slice(index + 1)]);
         }
 
+        // finds the closing parenthesis given open parenthesis in a string
+        function findClosingParenthesis(string, start) {
+            let depth = 0;
+            for (let i = start; i < string.length; i++) {
+                if (string[i] == '(') depth += 1;
+                if (string[i] == ')') depth -= 1;
+                if (depth == 0) return i;
+            }
+            throw new Error('No closing parenthesis found');
+        }
+
+        // removes parenthesis that surround the whole thing
+        function removeUnnecessaryParenthesis(string) {
+            if (!(string.startsWith('(') && string.endsWith(')'))) return string;
+            if (!/\(|\)/.test(string)) return string;
+
+            let depth = 0;
+            for (let i = 0; i < string.length - 1; i++) {
+                if (string[i] == '(') depth += 1;
+                if (string[i] == ')') depth -= 1;
+                if (depth == 0) return string;
+            }
+            return removeUnnecessaryParenthesis(string.slice(1, -1));
+        }
+
+        // tests if the string is in the form of functioname(morestuff)
+        function isStringFunction(string) {
+            if (!/^[a-zA-Z0-9]+\(/.test(string)) return false;
+            string = string.replace(/^[a-zA-Z0-9]+\(/, '(');
+            
+            let depth = 0;
+            for (let i = 0; i < string.length - 1; i++) {
+                if (string[i] == '(') depth += 1;
+                if (string[i] == ')') depth -= 1;
+                if (depth == 0) return false;
+            }
+            return true;
+        }
+
+        // parses a string that is in the form of functionname(morestuff)
+        function parseStringFunction(string) {
+            const expressions = removeUnnecessaryParenthesis(string.replace(/^[a-zA-Z0-9]+\(/, '(')).split(',');
+            const functionName = string.match(/^[a-zA-Z0-9]+/)[0];
+
+            return {
+                type: 'function',
+                inputs: expressions.map(expression => parseOperators(expression)),
+                name: functionName
+            };
+        }
+
+        // parses the operators ex. a + b --> {type: 'operator', operator: '+', left: 'a', right: 'b'}
+        function parseOperators(string) {
+            string = removeUnnecessaryParenthesis(string);
+
+            const operators = ['+', '-', '*', '/', '^'];
+            if (isStringFunction(string)) return parseStringFunction(string);
+            if (!/\+|\-|\*|\/|\^/.test(string)) return string;
+
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] == '(')
+                    i = findClosingParenthesis(string, i);
+                else if (operators.includes(string[i])) return {
+                    type: 'operator',
+                    operator: string[i],
+                    left: parseOperators(string.slice(0, i)),
+                    right: parseOperators(string.slice(i + 1))
+                };
+            }
+            return string;
+        }
+
+        // parses the string
+        function parseStringExpression(string) {
+            string = string.replaceAll(' ', '').replaceAll('**', '^');
+
+            let depth = 0;
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] == '(') depth += 1;
+                if (string[i] == ')') depth -= 1;
+                if (string[i] == ',' && depth == 0) {
+                    string = string.slice(0, i) + '@' + string.slice(i + 1);
+                    i++;
+                }
+            }
+
+            const expressions = string.split('@');
+            return expressions.map(expression => parseOperators(expression));
+        }
+
+        function branchToMathML(branch) {
+            const createElement = type => document.createElementNS('http://www.w3.org/1998/Math/MathML', type);
+
+            if (branch.type == 'operator') {
+                const surroundWithParenthesis = element => {
+                    const root = createElement('mrow');
+                    root.appendChild(createElement('mo')).appendChild(document.createTextNode('('));
+                    root.appendChild(element);
+                    root.appendChild(createElement('mo')).appendChild(document.createTextNode(')'));
+
+                    root.type = element.type;
+                    return root;
+                };
+                const {left, right, operator} = branch;
+
+                if (operator == '/') {
+                    const fraction = createElement('mfrac');
+                    fraction.appendChild(branchToMathML(left));
+                    fraction.appendChild(branchToMathML(right));
+
+                    fraction.type = '^';
+                    return fraction;
+                } else if (operator == '^') {
+                    // roots are super long when using capital letters for some reason
+                    const power = createElement('msup');
+
+                    let leftElement = branchToMathML(left);
+                    let rightElement = branchToMathML(right);
+
+                    if (leftElement.type != 'number') leftElement = surroundWithParenthesis(leftElement);
+
+                    power.appendChild(leftElement);
+                    power.appendChild(rightElement);
+
+                    power.type = '^';
+                    return power;
+                } else if (operator == '*') {
+                    const root = createElement('mrow');
+
+                    let leftElement = branchToMathML(left);
+                    let rightElement = branchToMathML(right);
+
+                    if (leftElement.type == '+' || leftElement.type == '-') leftElement = surroundWithParenthesis(leftElement);
+                    if (rightElement.type == '+' || rightElement.type == '-') rightElement = surroundWithParenthesis(rightElement);
+
+                    root.appendChild(leftElement);
+                    root.appendChild(rightElement);
+
+                    root.type = '*';
+                    return root;
+                } else {
+                    const root = createElement('mrow');
+                    root.appendChild(branchToMathML(left));
+                    root.appendChild(createElement('mo')).appendChild(document.createTextNode(operator));
+                    root.appendChild(branchToMathML(right));
+
+                    root.type = operator;
+                    return root;
+                }
+            } else if (branch.type == 'function') {
+                const functionElement = createElement('mrow');
+                functionElement.appendChild(createElement('mi')).appendChild(document.createTextNode(branch.name));
+                functionElement.appendChild(createElement('mo')).appendChild(document.createTextNode('('));
+
+                for (let input of branch.inputs) {
+                    functionElement.appendChild(branchToMathML(input));
+                    functionElement.appendChild(createElement('mo')).appendChild(document.createTextNode(','));
+                }
+                functionElement.removeChild(functionElement.lastChild);
+
+                functionElement.appendChild(createElement('mo')).appendChild(document.createTextNode(')'));
+                functionElement.type = 'function';
+                return functionElement;
+            } else {
+                const element = createElement(isNaN(branch) ? 'mi' : 'mn');
+                element.innerHTML = branch;
+
+                element.type = 'number';
+                return element;
+            }
+        }
+
+        // turns the tree into MathML
+        function treeToMathML(header, tree) {
+            const createElement = type => document.createElementNS('http://www.w3.org/1998/Math/MathML', type);
+
+            const root = createElement('math');
+            root.setAttribute('font-family', 'serif');
+            root.setAttribute('display', 'block');
+
+            root.appendChild(createElement('mi')).appendChild(document.createTextNode(header));
+            root.appendChild(createElement('mo')).appendChild(document.createTextNode('='));
+
+            for (let branch of tree) {
+                root.appendChild(branchToMathML(branch));
+                root.appendChild(createElement('mo')).appendChild(document.createTextNode(','));
+            }
+            root.removeChild(root.lastChild);
+            return root;
+        }
+
         // turns the huge unit conversions text into a datastructure
         function parseUnitConversions(unitConversions) {
             const units = unitConversions.split('\n');
@@ -2238,7 +2432,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             for (let i = 0; i < variables.length; i++) {
                 const input = document.createElement('input');
                 input.placeholder = `${descriptions[i]}`;
-                input.hoverText = `${descriptions[i]} (${units[i]})<br>${variables[i]} = ${rawEquations[i]}`;
+                input.hoverText = document.createElement('div');
+                input.hoverText.appendChild(document.createElement('span')).appendChild(document.createTextNode(`${descriptions[i]} (${units[i]})`));
+                input.hoverText.appendChild(document.createElement('br'));
+                input.hoverText.appendChild(document.createElement('br'));
+                input.hoverText.appendChild(treeToMathML(variables[i], parseStringExpression(rawEquations[i])));
                 input.isSolverInput = true;
                 input.holder = solver;
                 input.size = longestDescriptionLength;
@@ -2806,7 +3004,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                 if (event.target.hoverText) {
                     followMouse.style.display = 'block';
-                    followMouse.innerHTML = event.target.hoverText;
+                    followMouse.replaceChildren(event.target.hoverText);
                 } else followMouse.style.display = 'none';
             });
         }

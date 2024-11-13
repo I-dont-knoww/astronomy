@@ -318,9 +318,9 @@ T: orbital period
 Aphelion Velocity
 Velocity;Orbital Velocity
 vMae
-v;M;a;e
+v_a;M;a;e
 m/s;kg;m;none
-v_a: aphelion velocity
+v: aphelion velocity
 M: mass of star
 a: semi-major axis
 e: eccentricity
@@ -2596,6 +2596,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                                 error.throw(`You can't solve for more than one variable.`);
                                 return;
                             }
+                            inputs[i] = null;
                             solveFor = i;
                             continue;
                         }
@@ -2609,12 +2610,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         }
 
                         solveFor = inputElements.indexOf(document.activeElement);
-                        inputs[solveFor] = undefined;
+                        inputs[solveFor] = null;
                     }
 
                     // function that converts units but with special units
                     const convert = (number, startUnit, goalUnit) => {
-                        if (number == undefined) return undefined;
+                        if (number == null) return null;
                         if (Object.values(specialUnits).includes(startUnit) || Object.values(specialUnits).includes(goalUnit)) return number;
                         return convertUnit(number, startUnit, goalUnit);
                     };
@@ -2622,7 +2623,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     // convert and filter all inputs
                     inputs = inputs
                         .map((v, i) => convert(v, unitInputElements[i].value || unitInputElements[i].placeholder, unitInputElements[i].placeholder))
-                        .filter(v => v ?? false);
+                        .filter(v => v != null);
 
                     // force focus on the element being solved for
                     inputElements[solveFor].focus();

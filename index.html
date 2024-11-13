@@ -3139,6 +3139,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                 // if an element requires text input then don't use the keybinds
                 if (document.activeElement.textInputRequired) return;
+                // if they're pressing the alt key then let them enter normal text
+                if (event.altKey && event.key != 'Alt') deleteDefault(document.activeElement.value += event.key);
                 // if they're trying to use an actual keyboard shortcut let them
                 if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
                 

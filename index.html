@@ -618,6 +618,18 @@ p: parallax
 V * p / 4.75
 4.75 * m / V
 \\
+Total Velocity
+Velocity
+vrt
+v_tot;v_rad;v_tang
+m/s;m/s;m/s
+vtot: total velocity
+vrad: radial velocity
+vtang: tangential velocity
+(r ** 2 + t ** 2) ** 0.5
+(v ** 2 - t ** 2) ** 0.5
+(v ** 2 - r ** 2) ** 0.5
+\\
 Redshift (Simple Recessional Velocity)
 Redshift
 zv
@@ -715,6 +727,16 @@ M: mass of star
 L: luminosity of star
 L ** (1/3.5)
 M ** 3.5
+\\
+Stellar Lifetime and Mass [Approximation]
+Stars
+MT
+M;T
+Ms;yr
+M: mass of star
+T: age of star
+(T ** (-2/5)) * (10 ** 4)
+(M ** (-5/2)) * (10 ** 10)
 \\
 Bolometric Magnitude
 Magnitude and Luminosity;Magnitude

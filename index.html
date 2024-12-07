@@ -604,6 +604,26 @@ d / D
 t * D
 d / t
 \\
+Wavelength-Frequency for Electromagnetic Waves
+Light
+wf
+λ;f
+m;Hz
+λ: wavelength
+f: frequency
+c / f
+c / w
+\\
+Energy of Photon
+Light
+Ef
+E;f
+J;Hz
+E: energy
+f: frequency
+h * f
+E / h
+\\
 Redshift (Radial Velocity)
 Redshift
 Vsr
@@ -1977,16 +1997,17 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             return [d ** b * cos(b * t), d ** b * sin(b * t)];
         };
-
+        
+        const E = Math.E;
+        const PI = Math.PI;
         const G = 6.67430e-11; // N*m^2/kg^2
         const c = 299792458; // m/s
         const SB = 5.670374419e-8; // W*m^-2*K^-4
         const kB = 1.380649e-23; // J/K
         const b = 2.897771955e-3; // m*K
         const a = 7.5657e-16; // J*m^-3*K^-4
-        const E = Math.E;
         const h = 6.62607015e-34; // J*s
-        const PI = Math.PI;
+        const hbar = h / (2 * PI);
 
         const solarLum = 3.916e26; // W
         const solarMag = 4.83;

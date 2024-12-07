@@ -234,6 +234,7 @@ d: 1e-1
 0,0,1,0,0,0,0;Ms;1.98847e30
 0,0,0,1,0,0,0;A;1
 0,0,0,0,1,0,0;K;1
+0,0,0,0,1,0,0;Ts;5772
 0,0,0,0,0,1,0;cd;1
 0,0,0,0,0,0,1;mol;1
 0,0,0,0,0,0,1;#;1/6.02214076e23
@@ -269,6 +270,20 @@ r: total radius
 (F * (r ** 2)) / (G * M * p * d)
 (F * (r ** 2)) / (G * M * p * A)
 ((G * M * p * A * d) / F) ** 0.5
+\\
+Universal Gravitation
+Gravity
+Fabr
+F_g;m_A;m_B;r
+N;kg;kg;m
+F: force of gravitation
+mA: mass of object A
+mB: mass of object B
+r: distance between objects
+G * ((a * b) / (r ** 2))
+(r ** 2 * F) / (b * G)
+(r ** 2 * F) / (a * G)
+((G * a * b) / F) ** 0.5
 \\
 Gravitational Acceleration (Simple)
 Gravity
@@ -382,10 +397,34 @@ e: eccentricity
 ((G * M) / (v ** 2)) * ((1 + e) / (1 - e))
 ((((v ** 2) * a) / (G * M)) - 1) / ((((v ** 2) * a) / (G * M)) + 1)
 \\
+Aphelion Distance
+Orbits;Distance
+Rae
+R_a;a;e
+m;m;none
+Ra: aphelion distance
+a: semi-major axis
+e: eccentricity
+a * (1 + e)
+R / (1 + e)
+(R / a) - 1
+\\
+Perihelion Distance
+Orbits;Distance
+Rae
+R_p;a;e
+m;m;none
+Rp: perihelion distance
+a: semi-major axis
+e: eccentricity
+a * (1 - e)
+R / (1 - e)
+1 - (R / a)
+\\
 Gravitational Potential Energy (Between Two Objects)
 Gravity;Gravitational Potential Energy
 Uabr
-U_g;a;b;r
+U_g;m_1;m_2;r
 J;kg;kg;m
 U: gravitational potential energy
 m1: mass of object 1
@@ -555,7 +594,7 @@ M - 5 + (5 * log(d))
 Pogson's Formula
 Magnitude and Luminosity
 mIi
-m1-m2;I_1;I_2 
+m1-m2;I_1;I_2
 none;W/m^2;W/m^2
 m1 - m2: difference in apparent magnitude
 I1: intensity of object 1
@@ -604,20 +643,8 @@ p: parallax angle
 1/p
 1/D
 \\
-Small Angle (Arcseconds)
 Small Angle
-tdD
-θ;d;D
-arcsec;m;m
-θ: angle
-d: diameter of distant object
-D: distance to the object
-206265 * (d/D)
-t * D / 206265
-206265 * (d/t)
-\\
-Small Angle (Radians)
-Small Angle
+Main
 tdD
 θ;d;D
 rad;m;m
@@ -991,6 +1018,52 @@ v2: edge velocity of other galaxy
 L * ((v ** 4) / (V ** 4))
 ((L / l) * (v ** 4)) ** 0.25
 ((V ** 4) * (l / L)) ** 0.25
+\\
+Light Gathering Power
+Telescopes
+LD
+LGP;D
+m^2;m
+LGP: light gathering power
+D: diameter of objective
+(PI * D ** 2) / 4
+((4 * L) / PI) ** 0.5
+\\
+Resolving Power
+Telescopes
+twD
+θ;λ;D
+rad;m;m
+θ: angular separation
+λ: wavelength of light
+D: diameter of objective
+(1.22 * w) / D
+t * (D / 1.22)
+(1.22 * w) / t
+\\
+Magnification
+Telescopes
+Moe
+M;F_O;F_E
+none;m;m
+M: magnification power
+FO: focal length of objective
+FE: focal length of eyepiece
+o / e
+M * e
+o / M
+\\
+F Ratio
+Telescopes
+FfO
+F_ratio;L_f;D_O
+none;m;m
+F_ratio: focal length ratio
+Lf: focal length
+DO: diameter of objective
+f / O
+F * O
+f / F
 `).trim();
 
         const specialClassifications = {
@@ -2036,6 +2109,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const solarLum = 3.916e26; // W
         const solarMag = 4.83;
         const solarRad = 6957000000; // m
+        const solarTem = 5778; // K
 
         const abs = Math.abs;
 
@@ -2407,10 +2481,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     PI: 'π',
                     SB: 'σ',
                     kB: 'k_B',
+                    hbar: 'ħ',
                     E: 'e',
                     solarLum: 'L_⊙',
                     solarMag: 'M_⊙',
-                    solarRad: 'R_⊙'
+                    solarRad: 'R_⊙',
+                    solarTem: 'T_⊙'
                 };
 
                 return variableToMathML(variableNames[branch] ?? specialCharacters[branch] ?? branch);
@@ -2889,11 +2965,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     unitConversionsRaw = importText.value.trim();
                     unitConversions = parseUnitConversions(unitConversionsRaw);
 
-                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = hrClassifier.innerHTML = '';
-                    generateAllHTMLs(compileAllEquations(equations));
-                    resetImport();
-
-                    localStorage.unitConversions = unitConversionsRaw;
+                    localStorage.setItem('unitConversions', unitConversionsRaw);
+                    location.reload();
                 };
                 importCancel.onclick = resetImport;
             };
@@ -2908,13 +2981,28 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 importButton.onclick = () => {
                     equations = (new Function(`return \`${importText.value}\``))().trim();
 
-                    toolbar.innerHTML = equationSelector.innerHTML = equationSolver.innerHTML = unitConverter.innerHTML = hrClassifier.innerHTML = '';
-                    generateAllHTMLs(compileAllEquations(equations));
-                    resetImport();
-
-                    localStorage.equations = equations;
+                    localStorage.setItem('equations', equations);
+                    location.reload();
                 };
                 importCancel.onclick = resetImport;
+            };
+
+            const resetImportButton = document.createElement('button');
+            resetImportButton.innerHTML = 'Reset Imports';
+            resetImportButton.onclick = () => {
+                if (!confirm('Are you sure you want to reset one of your imports?')) return;
+                
+                const userInput = prompt(`Which import would you like to remove? Type out 'equations' or 'unit conversions'.`).toLowerCase();
+                const toRemove = userInput == 'equations' ? 'equations' : userInput == 'unit conversions' ? 'unitConversions' : null;
+                if (toRemove == null) {
+                    alert('Nothing was removed due to invalid input.');
+                    return;
+                }
+
+                if (!confirm(`Are you very sure that you want to reset ${userInput}?`)) return;
+
+                localStorage.removeItem(toRemove);
+                location.reload();
             };
 
             // instructions text
@@ -2946,6 +3034,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(importUnitConversionsButton);
             toolbar.appendChild(importEquationsButton);
+            toolbar.appendChild(resetImportButton);
             toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(instructionsButton);
             toolbar.appendChild(keyboardShortcutsButton);

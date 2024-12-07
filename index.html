@@ -282,8 +282,32 @@ r: radius of object
 (A * (r ** 2)) / G
 ((G * m) / A) ** 0.5
 \\
+Eccentricity from Aphelion and Perihelion Distance
+Orbits;Eccentricity
+eap
+e;r_a;r_p
+none;m;m
+e: eccentricity
+r_a: aphelion distance
+r_p: perihelion distance
+(a - p) / (a + p)
+(e * p + p) / (1 - e)
+(a - e * a) / (1 + e)
+\\
+Eccentricity from Semi-Major and Semi-Minor Axis
+Orbits;Eccentricity
+eab
+e;a;b
+none;m;m
+e: eccentricity
+a: semi-major axis
+b: semi-minor axis
+(((a ** 2) - (b ** 2)) ** 0.5) / a
+((b ** 2) / (1 - (e ** 2))) ** 0.5
+((a ** 2) - (e ** 2) * (a ** 2)) ** 0.5
+\\
 Escape Velocity
-Velocity
+Orbits;Velocity
 vMr
 v_e;M;r
 m/s;kg;m
@@ -295,7 +319,7 @@ r: distance from center of mass of object being escaped from
 (2 * G * M) / (v ** 2)
 \\
 Orbital Velocity (Mass and Distance)
-Velocity;Orbital Velocity
+Orbits;Velocity;Orbital Velocity
 vMr
 v;M;r
 m/s;kg;m
@@ -307,7 +331,7 @@ r: distance from object to center of mass of object being orbited
 (G * M) / (v ** 2)
 \\
 Orbital Velocity [Approximation] (Semi-Major Axis and Orbital Period)
-Velocity;Orbital Velocity
+Orbits;Velocity;Orbital Velocity
 vaT
 v;a;T
 m/s;m;s
@@ -319,7 +343,7 @@ T: orbital period
 (2 * PI * a) / v
 \\
 Orbital Velocity (Observed and Inclination Angle)
-Velocity;Orbital Velocity
+Orbits;Velocity;Orbital Velocity
 voi
 v;v_obs;i
 m/s;m/s;none
@@ -331,7 +355,7 @@ v * sin(i)
 asin(o / v), PI - asin(o / v)
 \\
 Aphelion Velocity
-Velocity;Orbital Velocity
+Orbits;Velocity;Orbital Velocity
 vMae
 v_a;M;a;e
 m/s;kg;m;none
@@ -345,7 +369,7 @@ e: eccentricity
 -(((((v ** 2) * a) / (G * M)) - 1) / ((((v ** 2) * a) / (G * M)) + 1))
 \\
 Perihelion Velocity
-Velocity;Orbital Velocity
+Orbits;Velocity;Orbital Velocity
 vMae
 v_p;M;a;e
 m/s;kg;m;none

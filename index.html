@@ -3624,7 +3624,14 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
                 
                 // add a keybind where a will go to main menu
-                if (event.key.toLowerCase() == keybinds.mainMenu) deleteDefault(mainMenuButton.onclick());
+                if (event.key.toLowerCase() == keybinds.mainMenu) {
+                    deleteDefault((() => {
+                        mainMenuButton.onclick();
+                        if (unitConverterButton.open) unitConverterButton.onclick();
+                        if (hrClassifierButton.open) hrClassifierButton.onclick();
+                        if (searchButton.open) searchButton.onclick();
+                    })());
+                }
                 // add a keybind where s will clear all values
                 else if (event.key.toLowerCase() == keybinds.clearAll) deleteDefault(clearAllButton.onclick());
                 // add a keybind where w will open the equation search menu

@@ -12,8 +12,15 @@
             box-sizing: border-box;
         }
 
-        h1, h2, h3, h4, h5, h6, div, button, span, p, input {
+        h1, h2, h3, h4, h5, h6, div, button, span, p, input, table, tr, th {
             font-family: monospace;
+        }
+
+        table, table * {
+            border: 1px solid black;
+            border-collapse: collapse;
+
+            padding: 0.5em;
         }
 
         #toolbar>* {
@@ -25,7 +32,7 @@
             display: block;
         }
 
-        #unitConverter, #importHolder, #hrClassifier, #searchMenu {
+        #unitConverter, #importHolder, #hrClassifier, #searchMenu, #numberMemory {
             position: fixed;
 
             left: 50%;
@@ -101,6 +108,7 @@
     </div>
 
     <div id="followMouse"></div>
+    <div id="numberMemory"></div>
 
     <script>
         const keybinds = {
@@ -111,7 +119,8 @@
             numberMode: 'g',
             searchMenu: 'w',
             inputBack: 'q',
-            inputForward: 'e'
+            inputForward: 'e',
+            numberMemory: 'r'
         };
 
         const instructionsText = `
@@ -2314,6 +2323,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const equationSelector = document.getElementById('equationSelector');
         const equationSolver = document.getElementById('equationSolver');
         const unitConverter = document.getElementById('unitConverter');
+        const numberMemory = document.getElementById('numberMemory');
 
         const importHolder = document.getElementById('importHolder');
         const importText = document.getElementById('importText');
@@ -2326,6 +2336,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const currentNumberModeText = document.getElementById('currentNumberModeText');
 
         const minimumInputSize = 50;
+
+        let numberMemoryIndex = 0;
+        const numberMemoryList = [];
+        const numberMemoryViewSize = 5;
+        const numberMemoryMaxSize = 100;
 
         const complex = (a, b) => [a, b];
         const Re = i => i[0];
@@ -2364,6 +2379,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const solarMag = 4.83;
         const solarRad = 6957000000; // m
         const solarTem = 5778; // K
+        const solarMass = 1.988475e30; // kg
+
+        const earthMass = 5.9722e24; // kg
+        const earthRad = 6371008.8; // m
 
         const abs = Math.abs;
 
@@ -3565,10 +3584,73 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             };
         }
 
+        function generateNumberMemory() {
+            numberMemory.style.display = 'none';
+            numberMemory.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Number History'));
+
+            const createRow = elements => {
+                const row = document.createElement('tr');
+                for (let element of elements)
+                    row.appendChild(document.createElement('th')).appendChild(typeof element != 'object' ? document.createTextNode(element) : element);
+                return row;
+            }
+            
+            const table = document.createElement('table');
+            table.style.width = '100%';
+
+            const header = createRow(['Index', 'Number', 'Units', 'Notes']);
+            table.appendChild(header);
+
+            const defaultValue = 'N/A';
+            for (let i = 0; i < numberMemoryViewSize; i++)
+                table.appendChild(createRow([i, defaultValue, defaultValue, defaultValue]));
+
+            table.children[1].style.backgroundColor = '#e3fcff';
+            numberMemory.appendChild(table);
+
+            const redraw = () => {
+
+                for (let i = 0; i < table.children.length; i++) {
+                    if (i == 0) continue;
+
+                    const row = table.children[i];
+                    const currentIndex = numberMemoryIndex + i - 1;
+
+                    row.children[0].innerText = currentIndex;
+                    row.children[1].innerHTML = numberMemoryList[currentIndex]?.number ?? defaultValue;
+                    row.children[2].innerHTML = numberMemoryList[currentIndex]?.unit ?? defaultValue;
+                    row.children[3].innerHTML = numberMemoryList[currentIndex]?.notes ?? defaultValue;
+                }
+            }
+
+            numberMemory.toggle = () => numberMemory.style.display = numberMemory.style.display == 'none' ? 'block' : 'none';
+            numberMemory.moveForward = () => {
+                numberMemoryIndex++;
+                redraw();
+            };
+            numberMemory.moveBackward = () => {
+                numberMemoryIndex--;
+                redraw();
+            };
+            numberMemory.copy = () => {
+                const number = numberMemoryList[numberMemoryIndex]?.number;
+                if (!number) return;
+
+                navigator.clipboard.writeText(number);
+            };
+            numberMemory.add = (number, unit, notes) => {
+                for (let i = numberMemoryList.length - 1; i >= 0; i--)
+                    numberMemoryList[i + 1] = numberMemoryList[i];
+                numberMemoryList[0] = { number, unit, notes };
+
+                redraw();
+            };
+        }
+
         function generateOnHover() {
             const followMouse = document.querySelector('#followMouse');
 
-            window.addEventListener('mousemove', event => {
+            function updateHoverText(event) {
                 const target = document.elementFromPoint(event.clientX, event.clientY);
                 if (!target) return;
 
@@ -3584,6 +3666,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         followMouse.replaceChildren(target.hoverText);
                     }
                 } else followMouse.style.display = 'none';
+            }
+
+            window.addEventListener('mousemove', event => {
+                updateHoverText(event);
             });
         }
 
@@ -3593,6 +3679,15 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             body.addEventListener('keydown', event => {
                 // function that prevents the normal keypress from happening
                 const deleteDefault = f => {event.preventDefault();};
+
+                // make it so copying anything puts it into the number memory
+                if (event.code == 'KeyC' && event.ctrlKey) {
+                    if (numberMemory.style.display == 'block') {
+                        deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].number));
+                    }
+                    else if (getSelection().toString().length > 0)
+                        numberMemory.add(getSelection().toString(), document.activeElement?.unit, document.activeElement?.placeholder);
+                }
 
                 // add a keybind where enter will press the solve button
                 if (event.key == 'Enter') {
@@ -3620,7 +3715,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 // if an element requires text input then don't use the keybinds
                 if (document.activeElement.textInputRequired) return;
                 // if they're pressing the alt key then let them enter normal text
-                if (event.altKey && event.key != 'Alt') deleteDefault(document.activeElement.value += event.key);
+                if (event.altKey && event.key != 'Alt' && event.key.length == 1) deleteDefault(document.activeElement.value += event.key);
                 // if they're trying to use an actual keyboard shortcut let them
                 if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
                 
@@ -3665,6 +3760,13 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
                 // add a keybind where f will open the hr classifier
                 else if (event.key.toLowerCase() == keybinds.hrClassifier) deleteDefault(hrClassifierButton.onclick());
+                // add a keybind where r will open the number memory
+                else if (event.key.toLowerCase() == keybinds.numberMemory) deleteDefault(numberMemory.toggle());
+                // add keybinds for moving through history
+                else if (numberMemory.style.display == 'block') {
+                    if (event.key.toLowerCase() == keybinds.inputBack) deleteDefault(numberMemory.moveBackward());
+                    else if (event.key.toLowerCase() == keybinds.inputForward) deleteDefault(numberMemory.moveForward());
+                }
                 // keybinds for moving between inputs
                 else if (document.activeElement.isSolverInput) {
                     if (event.key.toLowerCase() == keybinds.inputBack) deleteDefault((() => {
@@ -3696,6 +3798,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             // generate the hr classifier
             generateHRClassifier(hrInputs);
+
+            // generate number memory
+            generateNumberMemory();
 
             // generate toolbar and then generate keybinds using the toolbar buttons
             generateKeybinds(generateToolbar(mainButton));

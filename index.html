@@ -3086,8 +3086,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                             error.throw(`Some answer(s) were NaN`);
                     }
 
+                    const displayAnswer = answer.map(numberMode);
                     // display the final answer
-                    inputElements[solveFor].value = answer.map(numberMode).join(', ');
+                    inputElements[solveFor].value = displayAnswer.join(', ');
+                    // save final answer to history
+                    for (let i of displayAnswer) numberMemory.add(i, inputElements[solveFor].unit, inputElements[solveFor].placeholder);
+                    
                 } catch (e) {
                     if (e.message == conversionErrors.factorNotFound) error.throw('Conversion factor not found.');
                     else if (e.message == conversionErrors.prefixNotFound) error.throw('Unit prefix not found.');
@@ -3726,6 +3730,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         if (unitConverterButton.open) unitConverterButton.onclick();
                         if (hrClassifierButton.open) hrClassifierButton.onclick();
                         if (searchButton.open) searchButton.onclick();
+                        if (numberMemory.style.display == 'block') numberMemory.toggle();
                     })());
                 }
                 // add a keybind where s will clear all values

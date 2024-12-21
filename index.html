@@ -3348,19 +3348,31 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             unit1.textInputRequired = true;
             unit1.placeholder = 'unit 1';
             unit1.size = 10;
-
+            
             const inBetweenText = document.createElement('span');
             inBetweenText.innerHTML = ' ⇔ ';
+            inBetweenText.hoverText = '';
+            inBetweenText.updateHoverText = (unit1, unit2) => {
+                try {
+                    const conversion = convertUnit(1, unit1, unit2);
 
+                    inBetweenText.hoverText = `1 ${unit1} = ${conversion} ${unit2}`;
+                } catch (e) {}
+            };
+            
             const input2 = document.createElement('input');
             input2.placeholder = 'value 2';
             input2.isConverter = true;
             input2.size = 25;
-
+            
             const unit2 = document.createElement('input');
             unit2.textInputRequired = true;
             unit2.placeholder = 'unit 2';
             unit2.size = 10;
+            
+            inBetweenText.updateHoverText(unit1.value, unit2.value);
+            unit1.addEventListener('change', () => inBetweenText.updateHoverText(unit1.value, unit2.value));
+            unit2.addEventListener('change', () => inBetweenText.updateHoverText(unit1.value, unit2.value));
 
             const error = document.createElement('p');
             error.style.color = 'red';

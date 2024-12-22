@@ -3357,7 +3357,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     const conversion = convertUnit(1, unit1, unit2);
 
                     inBetweenText.hoverText = `1 ${unit1} = ${conversion} ${unit2}`;
-                } catch (e) {}
+                } catch (e) {
+                    if (e.message == conversionErrors.factorNotFound) inBetweenText.hoverText = 'Conversion factor not found.';
+                    else if (e.message == conversionErrors.prefixNotFound) inBetweenText.hoverText = 'Unit prefix not found.';
+                    else if (e.message == conversionErrors.conversionNotPossible) inBetweenText.hoverText = 'Conversion is not possible.';
+                    else inBetweenText.hoverText = `Code Error<br>${e}`;
+                }
             };
             
             const input2 = document.createElement('input');

@@ -200,6 +200,10 @@ Press ${keybinds.searchMenu} to open the search menu.
         };
 
         const SIPrefixes = Object.fromEntries(`
+Q: 1e30,
+R: 1e27,
+Y: 1e24,
+Z: 1e12,
 E: 1e18,
 P: 1e15,
 T: 1e12,
@@ -208,6 +212,10 @@ M: 1e6,
 k: 1e3,
 h: 1e2,
 da: 1e1,
+q: 1e-30,
+r: 1e-27,
+y: 1e-24,
+z: 1e-21,
 a: 1e-18,
 f: 1e-15,
 p: 1e-12,
@@ -235,12 +243,16 @@ d: 1e-1
 0,1,0,0,0,0,0;yd;0.9144
 0,1,0,0,0,0,0;mi;1609.344
 0,1,0,0,0,0,0;Rs;6.957e8
+0,1,0,0,0,0,0;Re;6371008.8
+0,1,0,0,0,0,0;Rj;7.1492e7
 0,1,0,0,0,0,0;au;149597870700
 0,1,0,0,0,0,0;ly;9460730472580800
 0,1,0,0,0,0,0;pc;30856755814913673
 0,0,1,0,0,0,0;g;0.001
 0,0,1,0,0,0,0;lb;0.45359237
-0,0,1,0,0,0,0;Ms;1.98847e30
+0,0,1,0,0,0,0;Ms;1.988475e30
+0,0,1,0,0,0,0;Me;5.9722e24
+0,0,1,0,0,0,0;Mj;1.8982e27
 0,0,0,1,0,0,0;A;1
 0,0,0,0,1,0,0;K;1
 0,0,0,0,1,0,0;Ts;5772
@@ -255,7 +267,7 @@ d: 1e-1
 -2,2,1,0,0,0,0;Cal;4184
 -2,2,1,0,0,0,0;eV;1.602176634e-19
 -1,2,1,0,0,0,0;W;1
--1,2,1,0,0,0,0;Ls;3.846e26
+-1,2,1,0,0,0,0;Ls;3.828e26
 0,3,0,0,0,0,0;L;0.001
 -2,-1,1,0,0,0,0;Pa;1
 -2,-1,1,0,0,0,0;atm;101325
@@ -2391,14 +2403,17 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const h = 6.62607015e-34; // J*s
         const hbar = h / (2 * PI);
 
-        const solarLum = 3.916e26; // W
+        const solarLum = convertUnitToSI(parseUnit('Ls')).number; // W
         const solarMag = 4.83;
-        const solarRad = 6957000000; // m
-        const solarTem = 5778; // K
-        const solarMass = 1.988475e30; // kg
+        const solarRad = convertUnitToSI(parseUnit('Rs')).number; // m
+        const solarTemp = convertUnitToSI(parseUnit('Ts')).number; // K
+        const solarMass = convertUnitToSI(parseUnit('Ms')).number; // kg
 
-        const earthMass = 5.9722e24; // kg
-        const earthRad = 6371008.8; // m
+        const earthMass = convertUnitToSI(parseUnit('Me')).number; // kg
+        const earthRad = convertUnitToSI(parseUnit('Re')).number; // m
+
+        const jupiterMass = convertUnitToSI(parseUnit('Mj')).number; // kg
+        const jupiterRad = convertUnitToSI(parseUnit('Rj')).number; // m
 
         const abs = Math.abs;
 
@@ -2773,9 +2788,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     hbar: 'ħ',
                     E: 'e',
                     solarLum: 'L_⊙',
-                    solarMag: 'M_⊙',
+                    solarMass: 'M_⊙',
                     solarRad: 'R_⊙',
-                    solarTem: 'T_⊙'
+                    solarTemp: 'T_⊙'
                 };
 
                 return variableToMathML(variableNames[branch] ?? specialCharacters[branch] ?? branch);
@@ -3782,13 +3797,14 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 else if (event.key.toLowerCase() == keybinds.unitConverter) {
                     deleteDefault(unitConverterButton.onclick());
 
+                    const [none1, input1, unit1, none2, input2, unit2] = unitConverter.children;
+                    if (unitConverterButton.open) input1.focus();
+
                     if (document.activeElement.isSolverInput && unitConverterButton.open) {
                         if (hrClassifierButton.open) {
                             hrClassifierButton.onclick();
                             hrClassifierButton.open = false;
                         }
-
-                        const [none1, input1, unit1, none2, input2, unit2] = unitConverter.children;
 
                         input1.value = document.activeElement.value;
                         unit1.value = document.activeElement.unit;

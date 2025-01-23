@@ -576,6 +576,18 @@ r * ((M + m) / m)
 (m * (a - r)) / r
 (M * r) / (a - r)
 \\
+Sum of Masses from Semi-Major Axis and Period
+Binary Systems;Sum of Masses
+maP
+$<mo>(</mo><msub><mi>M</mi><mn>1</mn></msub><mo>+</mo><msub><mi>M</mi><mn>2</mn></msub><mo>)</mo>;$<mo>(</mo><msub><mi>a</mi><mn>1</mn></msub><mo>+</mo><msub><mi>a</mi><mn>2</mn></msub><mo>)</mo>;P
+kg;m;s
+M1+M2: total combined mass of binary system
+a1+a2: semi-major axis of the system
+P: period of binary system
+((4 * PI ** 2) / G) * ((a ** 3) / (P ** 2))
+((m * G * P ** 2) / (4 * PI ** 2)) ** (1/3)
+(((4 * PI ** 2) / G) * ((a ** 3) / m)) ** 0.5
+\\
 Sum of Masses from Radial Velocity
 Binary Systems;Sum of Masses
 mvPi
@@ -589,6 +601,24 @@ i: inclination angle
 (((2 * PI * G * m) * ((sin(i)) ** 3)) / P) ** (1/3)
 (2 * PI * G * m * ((sin(i)) ** 3)) / (v ** 3)
 asin(((P / (2 * PI * G)) * ((v ** 3) / m)) ** (1/3)), PI - asin(((P / (2 * PI * G)) * ((v ** 3) / m)) ** (1/3))
+\\
+Binary Mass Function (Combined)
+Binary Systems;Binary Mass Function
+abiPKe
+M_1;M_2;i;P;K;e
+kg;kg;rad;s;m/s;none
+M1: mass of first object
+M2: mass of second object
+i: inclination angle
+P: period of binary system
+K: peak radial velocity of object 1
+e: eccentricity
+cubic1(2 * PI * G * (sin(i) ** 3), -((P * K ** 3) * ((1 - e ** 2) ** (3/2))), -(2 * b * (P * K ** 3) * ((1 - e ** 2) ** (3/2))), -((b ** 2) * (P * K ** 3) * ((1 - e ** 2) ** (3/2)))), cubic2(2 * PI * G * (sin(i) ** 3), -((P * K ** 3) * ((1 - e ** 2) ** (3/2))), -(2 * b * (P * K ** 3) * ((1 - e ** 2) ** (3/2))), -((b ** 2) * (P * K ** 3) * ((1 - e ** 2) ** (3/2)))), cubic3(2 * PI * G * (sin(i) ** 3), -((P * K ** 3) * ((1 - e ** 2) ** (3/2))), -(2 * b * (P * K ** 3) * ((1 - e ** 2) ** (3/2))), -((b ** 2) * (P * K ** 3) * ((1 - e ** 2) ** (3/2))))
+quad1((P * K ** 3) * ((1 - e ** 2) ** (3/2)), 2 * a * (P * K ** 3) * ((1 - e ** 2) ** (3/2)), ((a ** 2) * (P * K ** 3) * ((1 - e ** 2) ** (3/2))) - (2 * PI * G * (a ** 3) * (sin(i) ** 3))), quad2((P * K ** 3) * ((1 - e ** 2) ** (3/2)), 2 * a * (P * K ** 3) * ((1 - e ** 2) ** (3/2)), ((a ** 2) * (P * K ** 3) * ((1 - e ** 2) ** (3/2))) - (2 * PI * G * (a ** 3) * (sin(i) ** 3)))
+asin((((P * K ** 3) * ((1 - e ** 2) ** (3/2)) * ((a + b) ** 2)) / (2 * PI * G * (a ** 3))) ** (1/3)), PI - asin((((P * K ** 3) * ((1 - e ** 2) ** (3/2)) * (a ** 2 + 2 * a * b + b ** 2)) / (2 * PI * G * (a ** 3))) ** (1/3))
+(2 * PI * G * (a ** 3) * (sin(i) ** 3)) / ((K ** 3) * ((a + b) ** 2) * ((1 - (e ** 2)) ** (3/2)))
+((2 * PI * G * (a ** 3) * (sin(i) ** 3)) / (P * ((a + b) ** 2) * ((1 - (e ** 2)) ** (3/2)))) ** (1/3)
+(1 - (((2 * PI * G * (a ** 3) * (sin(i) ** 3)) / (P * (K ** 3) * ((a + b) ** 2))) ** (2/3))) ** 0.5
 \\
 Binary Mass Function (Mass of Objects and Inclination Angle)
 Binary Systems;Binary Mass Function

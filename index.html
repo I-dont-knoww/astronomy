@@ -3510,17 +3510,21 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     else if (input1.value == '') {
                         input1.value = numberMode(convertUnit(toNumber(input2.value), unit2.value, unit1.value));
                         input1.focus();
+                        numberMemory.add(input1.value, unit1.value, 'N/A');
                     } else if (input2.value == '') {
                         input2.value = numberMode(convertUnit(toNumber(input1.value), unit1.value, unit2.value));
                         input2.focus();
+                        numberMemory.add(input2.value, unit2.value, 'N/A');
                     } else if (document.activeElement.isConverter) {
                         document.activeElement.value = '';
                         if (input1.value == '') {
                             input1.value = numberMode(convertUnit(toNumber(input2.value), unit2.value, unit1.value));
                             input1.focus();
+                            numberMemory.add(input1.value, unit1.value, 'N/A');
                         } else if (input2.value == '') {
                             input2.value = numberMode(convertUnit(toNumber(input1.value), unit1.value, unit2.value));
                             input2.focus();
+                            numberMemory.add(input2.value, unit2.value, 'N/A');
                         }
                     } else {
                         error.throw('Nothing to convert.');

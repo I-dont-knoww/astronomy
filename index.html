@@ -1095,10 +1095,10 @@ T: transit duration
 P: orbital period
 l: transit length
 a: semi-major axis
-(P / PI) * asin(l / a)
-(T * PI) / (asin(l / a))
-a * sin((T * PI) / P)
-l / (sin((T * PI) / P))
+(P / PI) * asin(l / (2 * a))
+(T * PI) / (asin(l / (2 * a)))
+2 * a * sin((T * PI) / P)
+l / (2 * sin((T * PI) / P))
 \\
 Equilibrium Temperature
 Exoplanets

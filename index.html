@@ -3102,9 +3102,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 input.hoverText.appendChild(document.createElement('br'));
                 input.hoverText.appendChild(treeToMathML(variables[i], variableNames, parseStringExpression(rawEquations[i])));
                 input.isSolverInput = true;
+                input.history = -1;
                 input.holder = solver;
                 input.size = longestDescriptionLength;
                 input.unit = units[i];
+                input.onchange = () => input.history = -1;
 
                 const unitInput = document.createElement('input');
                 unitInput.placeholder = `${units[i]}`;
@@ -3837,6 +3839,42 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     }
                     else if (getSelection().toString().length > 0)
                         numberMemory.add(getSelection().toString(), document.activeElement?.unit, document.activeElement?.placeholder);
+                }
+
+                if (event.code == 'ArrowUp' && document.activeElement.isSolverInput) {
+                    const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
+                    const element = document.activeElement;
+
+                    if (numberMemoryList[element.history]?.number != Number(element.value)) element.history = -1;
+
+                    let history;
+                    for (history = element.history + 1; history < numberMemoryList.length; history++) {
+                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit)).unit;
+                        const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
+
+                        if (equals(unit1, unit2)) {
+                            element.value = numberMemoryList[history].number;
+                            element.unit = numberMemoryList[history].unit;
+                            element.history = history;
+                            return;
+                        }
+                    }
+                }
+                if (event.code == 'ArrowDown' && document.activeElement.isSolverInput) {
+                    const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
+
+                    let history;
+                    for (history = document.activeElement.history - 1; history >= 0; history--) {
+                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit)).unit;
+                        const unit2 = convertUnitToSI(parseUnit(document.activeElement.unit)).unit;
+
+                        if (equals(unit1, unit2)) {
+                            document.activeElement.value = numberMemoryList[history].number;
+                            document.activeElement.unit = numberMemoryList[history].unit;
+                            document.activeElement.history = history;
+                            return;
+                        }
+                    }
                 }
 
                 // add a keybind where enter will press the solve button

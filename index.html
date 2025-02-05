@@ -3217,7 +3217,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     // display the final answer
                     inputElements[solveFor].value = displayAnswer.join(', ');
                     // save final answer to history
-                    for (let i of displayAnswer) numberMemory.add(i, inputElements[solveFor].unit, inputElements[solveFor].placeholder);
+                    for (let i of displayAnswer) numberMemory.add(i, inputElements[solveFor].nextSibling.value, inputElements[solveFor].placeholder);
                     
                 } catch (e) {
                     if (e.message == conversionErrors.factorNotFound) error.throw('Conversion factor not found.');
@@ -3854,7 +3854,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                         if (equals(unit1, unit2)) {
                             element.value = numberMemoryList[history].number;
-                            element.unit = numberMemoryList[history].unit;
+                            element.nextSibling.value = numberMemoryList[history].unit;
                             element.history = history;
                             return;
                         }
@@ -3862,16 +3862,17 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
                 if (event.code == 'ArrowDown' && document.activeElement.isSolverInput) {
                     const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
+                    const element = document.activeElement;
 
                     let history;
-                    for (history = document.activeElement.history - 1; history >= 0; history--) {
+                    for (history = element.history - 1; history >= 0; history--) {
                         const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit)).unit;
-                        const unit2 = convertUnitToSI(parseUnit(document.activeElement.unit)).unit;
+                        const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
 
                         if (equals(unit1, unit2)) {
-                            document.activeElement.value = numberMemoryList[history].number;
-                            document.activeElement.unit = numberMemoryList[history].unit;
-                            document.activeElement.history = history;
+                            element.value = numberMemoryList[history].number;
+                            element.nextSibling.value = numberMemoryList[history].unit;
+                            element.history = history;
                             return;
                         }
                     }

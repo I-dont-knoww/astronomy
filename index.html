@@ -2640,8 +2640,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const cubic3 = (a, b, c, d) => cubic(a, b, c, d)[2];
 
         let numberMode = toDefault;
-        const numberModes = [toDefault, toExact, toScientific];
-        const numberModeNames = ['Default', 'Exact', 'Scientific'];
+        const numberModes = [toDefault, toScientific];
+        const numberModeNames = ['Default', 'Scientific'];
 
         function toDefault(number) {
             return number.toString();

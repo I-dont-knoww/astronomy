@@ -279,6 +279,76 @@ d: 1e-1
         const specialUnits = {none: 'no units', any: 'any unit', same: 'same unit as above'};
 
         let equations = (localStorage.equations || `
+Kinematic Equation (No x)
+Basic Math;Kinematic Equations
+fiat
+v_f;v_0;a;t
+m/s;m/s;m/s^2;s
+vf: final velocity
+v0: initial velocity
+a: acceleration
+t: time
+i + a * t
+f - a * t
+(f - i) / t
+(f - i) / a
+\\
+Kinematic Equation (No vf)
+Basic Math;Kinematic Equations
+xiat
+x;v_0;a;t
+m;m/s;m/s^2;s
+x: displacement
+v0: initial velocity
+a: acceleration
+t: time
+i * t + 0.5 * a * (t ** 2)
+x * (t ** (-1)) - 0.5 * a * t
+2 * x * (t ** (-2)) - 2 * i * (t ** (-1))
+quad1(0.5 * a, i, -x), quad2(0.5 * a, i, -x)
+\\
+Kinematic Equation (No t)
+Basic Math;Kinematic Equations
+fiax
+v_f;v_0;a;x
+m/s;m/s;m/s^2;m
+vf: final velocity
+vi: initial velocity
+a: acceleration
+x: displacement
+((i ** 2) + 2 * a * x) ** 0.5, -(((i ** 2) + 2 * a * x) ** 0.5)
+((f ** 2) - 2 * a * x) ** 0.5, -(((f ** 2) - 2 * a * x) ** 0.5)
+((f ** 2) - (i ** 2)) / (2 * x)
+((f ** 2) - (i ** 2)) / (2 * a)
+\\
+Kinematic Equation (No a)
+Basic Math;Kinematic Equations
+fixt
+v_f;v_0;x;t
+m/s;m/s;m;s
+vf: final velocity
+vi: initial velocity
+x: displacement
+t: time
+((2 * x) / t) - i
+((2 * x) / t) - f
+0.5 * (f + i) * t
+(2 * x) / (f + i)
+\\
+Kinematic Equation (No vi)
+Basic Math;Kinematic Equations
+faxt
+v_f;a;x;t
+m/s;m/s^2;m;s
+vf: final velocity
+a: acceleration
+x: displacement
+t: time
+x * (t ** (-1)) + 0.5 * a * t
+2 * f * (t ** (-1)) - 2 * x * (t ** (-2))
+f * t - 0.5 * a * (t ** 2)
+quad1(-0.5 * a, f, -x), quad2(-0.5 * a, f, -x)
+\\
 Inward Gravitation
 Gravity
 FMpAdr

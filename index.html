@@ -3319,7 +3319,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     // display the final answer
                     inputElements[solveFor].value = displayAnswer.join(', ');
                     // save final answer to history
-                    for (let i of displayAnswer) numberMemory.add(i, inputElements[solveFor].nextSibling.value, inputElements[solveFor].placeholder);
+                    for (let i of displayAnswer) numberMemory.add(i, inputElements[solveFor].nextSibling.value || inputElements[solveFor].unit, inputElements[solveFor].placeholder);
                     
                 } catch (e) {
                     if (e.message == conversionErrors.factorNotFound) error.throw('Conversion factor not found.');

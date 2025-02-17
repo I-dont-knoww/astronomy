@@ -3945,7 +3945,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].number));
                     }
                     else if (getSelection().toString().length > 0)
-                        numberMemory.add(getSelection().toString(), document.activeElement?.unit ? document.activeElement.nextSibling.value || document.activeElement.unit : '', document.activeElement?.placeholder);
+                        numberMemory.add(getSelection().toString(), (document.activeElement?.unit) ? (document.activeElement.nextSibling.value || document.activeElement.unit) : '', document.activeElement?.placeholder);
                 }
 
                 if (event.code == 'ArrowUp' && document.activeElement.isSolverInput) {

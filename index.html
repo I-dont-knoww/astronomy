@@ -227,6 +227,7 @@ d: 1e-1
         `.trim().split(',\n').map(v => v.split(': ')).map(v => [v[0], Number(v[1])]));
 
         let unitConversionsRaw = localStorage.unitConversions || `
+0,0,0,0,0,0,0;no units;1
 0,0,0,0,0,0,0;rad;1
 0,0,0,0,0,0,0;rot;6.283185307179586
 0,0,0,0,0,0,0;deg;0.017453292519943295
@@ -276,7 +277,7 @@ d: 1e-1
         `.trim();
         let unitConversions = parseUnitConversions(unitConversionsRaw);
 
-        const specialUnits = {none: 'no units', any: 'any unit', same: 'same unit as above'};
+        const specialUnits = {none: 'no units'};
 
         let equations = (localStorage.equations || `
 Density
@@ -3955,12 +3956,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                     let history;
                     for (history = element.history + 1; history < numberMemoryList.length; history++) {
-                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit)).unit;
+                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
                         const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
 
                         if (equals(unit1, unit2)) {
                             element.value = numberMemoryList[history].number;
-                            element.nextSibling.value = numberMemoryList[history].unit;
+                            element.nextSibling.value = numberMemoryList[history].unit ?? '';
                             element.history = history;
                             return;
                         }
@@ -3972,12 +3973,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                     let history;
                     for (history = element.history - 1; history >= 0; history--) {
-                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit)).unit;
+                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
                         const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
 
                         if (equals(unit1, unit2)) {
                             element.value = numberMemoryList[history].number;
-                            element.nextSibling.value = numberMemoryList[history].unit;
+                            element.nextSibling.value = numberMemoryList[history].unit ?? '';
                             element.history = history;
                             return;
                         }

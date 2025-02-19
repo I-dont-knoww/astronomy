@@ -749,7 +749,7 @@ M2: mass of second object
 i: inclination angle
 ((m ** 3) * (sin(i) ** 3)) / ((M + m) ** 2)
 ((((m ** 3) * (sin(i) ** 3)) / f) ** 0.5) - m
-cubic1(sin(i) ** 3, -f, -2 * f * M, -f * (M ** 2)), cubic2(sin(i) ** 3, -f, 2 * f * M, f * (M ** 2)), cubic3(sin(i) ** 3, -f, 2 * f * M, f * (M ** 2))
+cubic1(sin(i) ** 3, -f, -2 * f * M, -f * (M ** 2)), cubic2(sin(i) ** 3, -f, 2 * f * M, -f * (M ** 2)), cubic3(sin(i) ** 3, -f, 2 * f * M, -f * (M ** 2))
 asin(((f * (M ** 2 + 2 * M * m + m ** 2)) / (m ** 3)) ** (1/3)), PI - asin(((f * (M ** 2 + 2 * M * m + m ** 2)) / (m ** 3)) ** (1/3))
 \\
 Binary Mass Function (Orbital Period, Maximum Radial Velocity, and Eccentricity)

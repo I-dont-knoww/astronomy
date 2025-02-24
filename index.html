@@ -45,6 +45,13 @@
             background-color: white;
         }
 
+        #headers {
+            position: sticky;
+            top: 0%;
+
+            background-color: white;
+        }
+
         #currentNumberMode {
             position: fixed;
             top: 0%;
@@ -79,13 +86,18 @@
 </head>
 <body>
     <h1>Astronomy Solver</h1>
-    <hr>
-    <h2>Toolbar</h2>
-    <div id="toolbar"></div>
-    <hr>
+
+    <div id="headers">
+        <hr>
+        <h2>Toolbar</h2>
+        <div id="toolbar"></div>
+        <hr>
+    </div>
+
     <h2>Equation Selector</h2>
     <div id="equationSelector"></div>
     <hr>
+
     <h2>Equation Solvers</h2>
     <div id="equationSolver"></div>
     <div id="unitConverter"></div>
@@ -93,7 +105,7 @@
     <div id="searchMenu">
         <h2>Search Menu</h2>
         <input><br><br>
-        <button>search</button><br>
+        <button>search</button><br><br>
         <span></span>
     </div>
     <br><br><br><br><br><br><br><br>
@@ -549,6 +561,50 @@ e: eccentricity
 a * (1 - e)
 R / (1 - e)
 1 - (R / a)
+\\
+Specific Orbital Energy (Relative Orbital Speed, Mass, and Distance)
+Orbits;Energy;Specific Orbital Energy
+evabr
+ε;v;M_1;M_2;r
+J;m/s;kg;kg;m
+ε: specific orbital energy
+v: relative orbital speed
+M1: mass of object 1
+M2: mass of object 2
+r: distance between objects
+((v ** 2) / 2) - ((G * (a + b)) / r)
+((2 * e) + ((2 * G * (a + b)) / r)) ** 0.5
+((r * ((v ** 2) - 2 * e)) / (2 * G)) - b
+((r * ((v ** 2) - 2 * e)) / (2 * G)) - a
+(2 * G * (a + b)) / ((v ** 2) - (2 * e))
+\\
+Specific Orbital Energy (Mass and Semimajor Axis)
+Orbits;Energy;Specific Orbital Energy
+eABa
+ε;M_1;M_2;a
+J;kg;kg;m
+ε: specific orbital energy
+M1: mass of object 1
+M2: mass of object 2
+a: length of semi-major axis
+-((G * (A + B)) / (2 * a))
+-((2 * e * a) / G) - B
+-((2 * e * a) / G) - A
+-((G * (A + B)) / (2 * e))
+\\
+Vis-Viva Equation
+Orbits;Energy
+vraM
+v;r;a;M
+m/s;m;m;kg
+v: relative speed of the two bodies
+r: distance between the bodies' center of mass
+a: length of the semi-major axis
+M: mass of the central body
+(G * M * ((2 / r) - (1 / a))) ** 0.5, -((G * M * ((2 / r) - (1 / a))) ** 0.5)
+2 / (((v ** 2) / (G * M)) + (1 / a))
+1 / ((2 / r) - ((v ** 2) / (G * M)))
+(v ** 2) / (G * ((2 / r) - (1 / a)))
 \\
 Gravitational Potential Energy (Between Two Objects)
 Gravity;Gravitational Potential Energy
@@ -3425,26 +3481,64 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const searchForButton = document.querySelector('#searchMenu>button');
             searchForButton.onclick = () => {
                 searchError.clear();
-                try {
-                    const unitsToSearch = searchInput.value.split(';').map(unit => convertUnitToSI(parseUnit(unit)).unit);
-                
+
+                const checkString = (stringToFind, string) => {
+                    let i = 0;
+                    for (let j = 0; j < stringToFind.length; j++) {
+                        if (stringToFind[j] == ' ') continue;
+
+                        while (i < string.length - 1 && string[i].toLowerCase() != stringToFind[j].toLowerCase()) i++;
+                        if (string[i].toLowerCase() != stringToFind[j].toLowerCase()) return false;
+                    }
+                    return true;
+                }
+
+                const filterHeaders = rawInput => {
+                    const headerToFind = rawInput.trim();
+                    
                     for (let solver of equationSolver.children) {
-                        try {
-                            solver.style.display = 'none';
+                        const header = solver.id;
+
+                        if (!checkString(headerToFind, header)) solver.style.display = 'none';
+                    }
+                };
+
+                const filterCategories = rawInput => {
+                    const categoryToFind = rawInput.trim();
+
+                    for (let solver of equationSolver.children) {
+                        const category = solver.category.at(-1);
+
+                        if (!checkString(categoryToFind, category)) solver.style.display = 'none';
+                    }
+                };
+                
+                const filterUnits = rawInput => {
+                    try {
+                        const unitsToSearch = rawInput.split(';').map(unit => convertUnitToSI(parseUnit(unit)).unit);
+                    
+                        for (let solver of equationSolver.children) {
                             const units = solver.units.map(unit => convertUnitToSI(parseUnit(unit)).unit);
                             
                             if (units.length < unitsToSearch.length) continue;
-                            if (unitsToSearch.every(unit => units.find(v => v.every((_, i) => unit[i] == v[i])))) solver.style.display = 'block';
-                        } catch (e) {if (!Object.values(conversionErrors).includes(Number(e.message))) searchError.throw(`Code Error<br>${e}`);}
-                    }
+                            if (!unitsToSearch.every(unit => units.find(v => v.every((_, i) => unit[i] == v[i])))) solver.style.display = 'none';
+                        }
 
-                    searchInput.blur();
-                } catch (e) {
-                    if (e.message == conversionErrors.factorNotFound) searchError.throw('Conversion factor not found.');
-                    else if (e.message == conversionErrors.prefixNotFound) searchError.throw('Unit prefix not found.');
-                    else if (e.message == conversionErrors.conversionNotPossible) searchError.throw('Conversion is not possible.');
-                    else searchError.throw(`Code Error<br>${e}`);
-                }
+                        searchInput.blur();
+                    } catch (e) {
+                        if (e.message == conversionErrors.factorNotFound) searchError.throw('Conversion factor not found.');
+                        else if (e.message == conversionErrors.prefixNotFound) searchError.throw('Unit prefix not found.');
+                        else if (e.message == conversionErrors.conversionNotPossible) searchError.throw('Conversion is not possible.');
+                        else searchError.throw(`Code Error<br>${e}`);
+                    }
+                };
+
+                const searchParameters = Object.fromEntries(searchInput.value.split('\\').map(v => v.split('#')));
+                if ('h' in searchParameters) filterHeaders(searchParameters['h']);
+                if ('c' in searchParameters) filterCategories(searchParameters['c']);
+                if ('u' in searchParameters) filterUnits(searchParameters['u']);
+
+                searchInput.blur();
             };
 
             const searchButton = document.createElement('button');
@@ -4028,9 +4122,6 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         }
                     }
                 }
-                // make it so that whatever happens, if searchMenu keybind is pressed then it will close the search menu
-                else if (event.key == keybinds.searchMenu && searchButton.open) deleteDefault(searchButton.onclick());
-
                 // add a keybind where esc will unfocus the current focused element
                 else if (event.key == 'Escape') document.activeElement.blur();
 

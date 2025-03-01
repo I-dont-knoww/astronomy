@@ -1236,7 +1236,7 @@ M: mass of object
 Transit Depth
 Exoplanets;Transit Method
 drR
-δ;R_planet;R_star
+δ;R_p;R_*
 none;m;m
 δ: transit depth
 Rplanet: radius of exoplanet
@@ -1290,7 +1290,7 @@ l / (2 * sin((T * PI) / P))
 Equilibrium Temperature
 Exoplanets
 tTARD
-T_p;T_☉;A;R_☉;D
+T_p;T_*;A;R_*;D
 K;K;none;m;m
 Tp: temperature of planet
 T☉: temperature of star
@@ -1314,6 +1314,22 @@ P: period of orbit
 ((2 * PI * G * S) / P) ** (1/3)
 ((v ** 3) * P) / (2 * PI * G)
 (2 * PI * G * S) / (v ** 3)
+\\
+Stellar Mass from Exoplanet Properties
+Exoplanets;Radial Velocity Method
+MaTVv
+M_*;a;T;v_*;v_p
+kg;m;s;m/s;m/s
+M*: mass of star
+a: semi-major axis
+T: orbital period
+v*: velocity of star
+vp: velocity of planet
+(4 * (PI ** 2) * (a ** 3)) / (G * (T ** 2) * (1 + (V / v)))
+((G * M * (T ** 2) * (1 + (V / v))) / (4 * (PI ** 2))) ** (1/3)
+((4 * (PI ** 2) * (a ** 3)) / (G * M * (1 + (V / v)))) ** 0.5
+((4 * (PI ** 2) * (a ** 3) * v) / (G * (T ** 2) * M)) - v
+(G * (T ** 2) * M * V) / ((4 * (PI ** 2) * (a ** 3)) - (G * (T ** 2) * M))
 \\
 Tully-Fisher
 Main

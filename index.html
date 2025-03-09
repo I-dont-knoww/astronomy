@@ -1266,21 +1266,21 @@ acos((b * R) / a), 2 * PI - acos((b * R) / a)
 Transit Length
 Exoplanets;Transit Method
 lrRb
-l;R_planet;R_star;b
+l;R_p;R_*;b
 m;m;m;none
 l: transit length
-Rplanet: radius of exoplanet
-Rstar: radius of star
+Rp: radius of exoplanet
+R*: radius of star
 b: impact parameter
 2 * (((r + R) ** 2 - (b * R) ** 2) ** 0.5)
 quad1(1, 2 * R, R ** 2 - (b * R) ** 2 - (l / 2) ** 2), quad2(1, 2 * R, R ** 2 - (b * R) ** 2 - (l / 2) ** 2)
 quad1(1 - b ** 2, 2 * r, r ** 2 - (l / 2) ** 2), quad2(1 - b ** 2, 2 * r, r ** 2 - (l / 2) ** 2)
 (((R + r) ** 2 - (l / 2) ** 2) ** 0.5) / R
 \\
-Transit Duration
+Transit Duration (Transit Length, Orbital Period, Semi-Major Axis)
 Exoplanets;Transit Method
 TPla
-T_dur;P;l;a
+T;P;l;a
 s;s;m;m
 T: transit duration
 P: orbital period
@@ -1290,6 +1290,24 @@ a: semi-major axis
 (T * PI) / (asin(l / (2 * a)))
 2 * a * sin((T * PI) / P)
 l / (2 * sin((T * PI) / P))
+\\
+Transit Duration (Radius of Exoplanet and Star, Impact Parameter, Orbital Period, Semi-Major Axis)
+Exoplanets;Transit Method
+TPrRba
+T;P;R_p;R_*;b;a
+s;s;m;m;none;m
+T: transit duration
+P: orbital period
+Rp: radius of exoplanet
+R*: radius of star
+b: impact parameter
+a: semi-major axis
+(P / PI) * asin((((r + R) ** 2 - (b * R) ** 2) ** 0.5) / a)
+(PI * T) / (asin((((r + R) ** 2 - (b * R) ** 2) ** 0.5) / a))
+quad1(1, 2 * R, (R ** 2) - (b ** 2) * (R ** 2) - ((a * sin((PI * T) / P))) ** 2), quad2(1, 2 * R, (R ** 2) - (b ** 2) * (R ** 2) - ((a * sin((PI * T) / P))) ** 2)
+quad1(1 - (b ** 2), 2 * r, (r ** 2) - (a * sin((PI * T) / P)) ** 2), quad2(1 - (b ** 2), 2 * r, (r ** 2) - (a * sin((PI * T) / P)) ** 2)
+(1 + ((2 * r) / R) - (((a * sin((PI * T) / P)) ** 2) - (r ** 2)) / (R ** 2)) ** 0.5
+(((r ** 2) + (2 * r * R) + (R ** 2) - (b ** 2) * (R ** 2)) / ((sin((PI * T) / P)) ** 2)) ** 0.5
 \\
 Equilibrium Temperature
 Exoplanets
@@ -3522,6 +3540,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     return true;
                 }
 
+                const showSolvers = () => {
+                    for (let solver of equationSolver.children) solver.style.display = 'block';
+                };
+
                 const filterHeaders = rawInput => {
                     const headerToFind = rawInput.trim();
                     
@@ -3545,12 +3567,29 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 const filterUnits = rawInput => {
                     try {
                         const unitsToSearch = rawInput.split(';').map(unit => convertUnitToSI(parseUnit(unit)).unit);
+                        const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
                     
                         for (let solver of equationSolver.children) {
                             const units = solver.units.map(unit => convertUnitToSI(parseUnit(unit)).unit);
+                            const unitsUsed = Array.from(new Array(units.length), () => false);
+
+                            const unitsToSearchUsed = Array.from(new Array(unitsToSearch.length), () => false);
                             
-                            if (units.length < unitsToSearch.length) continue;
-                            if (!unitsToSearch.every(unit => units.find(v => v.every((_, i) => unit[i] == v[i])))) solver.style.display = 'none';
+                            for (let i = 0; i < unitsToSearch.length; i++) {
+                                const unitToSearch = unitsToSearch[i];
+
+                                for (let j = 0; j < units.length; j++) if (!unitsUsed[j]) {
+                                    const unit = units[j];
+
+                                    if (equals(unitToSearch, unit)) {
+                                        unitsToSearchUsed[i] = true;
+                                        unitsUsed[j] = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (units.length < unitsToSearch.length || !unitsToSearchUsed.every(v => v)) solver.style.display = 'none';
                         }
 
                         searchInput.blur();
@@ -3562,6 +3601,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     }
                 };
 
+                showSolvers();
                 const searchParameters = Object.fromEntries(searchInput.value.split('\\').map(v => v.split('#')));
                 if ('h' in searchParameters) filterHeaders(searchParameters['h']);
                 if ('c' in searchParameters) filterCategories(searchParameters['c']);

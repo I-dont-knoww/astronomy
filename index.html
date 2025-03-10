@@ -32,7 +32,7 @@
             display: block;
         }
 
-        #unitConverter, #importHolder, #hrClassifier, #searchMenu, #numberMemory {
+        #unitConverter, #importHolder, #hrClassifier, #unitEvaluator, #searchMenu, #numberMemory {
             position: fixed;
 
             left: 50%;
@@ -82,6 +82,11 @@
             width: 75vw;
             height: 75vh;
         }
+
+        #unitEvaluator textarea {
+            width: 50vw;
+            height: 50vh;
+        }
     </style>
 </head>
 <body>
@@ -102,6 +107,14 @@
     <div id="equationSolver"></div>
     <div id="unitConverter"></div>
     <div id="hrClassifier"></div>
+    <div id="unitEvaluator">
+        <h2>Unit Evaluator</h2>
+        <textarea></textarea>
+        <br>
+        <span>= </span><input id="output"><input id="units">
+        <button>evaluate</button><br><br>
+        <p></p>
+    </div>
     <div id="searchMenu">
         <h2>Search Menu</h2>
         <input><br><br>
@@ -128,6 +141,7 @@
             clearAll: 's',
             unitConverter: 'd',
             hrClassifier: 'f',
+            unitEvaluator: 'v',
             numberMode: 'g',
             searchMenu: 'w',
             inputBack: 'q',
@@ -209,6 +223,10 @@ Press ${keybinds.searchMenu} to open the search menu.
             factorNotFound: 1,
             prefixNotFound: 2,
             conversionNotPossible: 3
+        };
+
+        const unitEvaluationErrors = {
+            unitsDoNotMatch: 4
         };
 
         const SIPrefixes = Object.fromEntries(`
@@ -2670,6 +2688,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const equationSelector = document.getElementById('equationSelector');
         const equationSolver = document.getElementById('equationSolver');
         const unitConverter = document.getElementById('unitConverter');
+        const hrClassifier = document.getElementById('hrClassifier');
+        const unitEvaluator = document.getElementById('unitEvaluator');
         const numberMemory = document.getElementById('numberMemory');
 
         const importHolder = document.getElementById('importHolder');
@@ -2677,8 +2697,6 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const importButton = document.getElementById('importButton');
         const importCancel = document.getElementById('importCancel');
         importText.textInputRequired = true;
-
-        const hrClassifier = document.getElementById('hrClassifier');
 
         const currentNumberModeText = document.getElementById('currentNumberModeText');
 
@@ -2957,7 +2975,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             string = removeUnnecessaryParenthesis(string);
 
             if (isStringFunction(string)) return parseStringFunction(string);
-            if (!/\+|\-|\*|\/|\^/.test(string)) return string;
+            if (!/\+|\-|\*|\/|\^/.test(string)) {
+                if (string.startsWith('$')) string = '-' + string.slice(1);
+                return string;
+            }
 
             const operators = [['^'], ['*', '/'], ['+', '-']];
             for (let order of operators.toReversed()) {
@@ -2996,6 +3017,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     i++;
                 }
             }
+
+            for (let i = 0; i < string.length; i++) if (string[i] == '-' && string[i + 1] != '(' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1])))
+                string = string.slice(0, i) + '$' + string.slice(i + 1);
 
             const expressions = string.split('@');
             return expressions.map(expression => parseOperators(expression));
@@ -3048,7 +3072,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                 const operatorSymbols = {
                     '+': '+',
-                    '-': '-',
+                    '-': '–',
                 };
                 const specialOperators = {
                     '/': 'mfrac',
@@ -3140,6 +3164,183 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             }
             root.removeChild(root.lastChild);
             return root;
+        }
+
+        function parseUnitStringExpression(string) {
+            const hiddenUnits = [];
+            let unitsReplaced = 0;
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] == '[') {
+                    let j;
+                    for (j = i + 1; j < string.length; j++) if (string[j] == ']') break;
+
+                    const unit = string.substring(i + 1, j);
+                    hiddenUnits.push(unit);
+                    
+                    string = string.replaceAll(`[${unit}]`, `{${unitsReplaced}}`);
+                    unitsReplaced++;
+                }
+            }
+
+            return {expression: parseStringExpression(string)[0], hiddenUnits};
+        }
+
+        // evaluates a parsed operator section
+        function evaluateOperator(operator, hiddenUnits) {
+            const {sections, operators} = operator;
+            const evaluatedSections = [];
+            const evaluatedUnits = [];
+
+            for (let i = 0; i < sections.length; i++) {
+                const section = sections[i];
+
+                if (typeof section == 'string') {
+                    let [number, unitString] = section.replaceAll('}', '').split('{');
+                    if (number == '') number = '0';
+
+                    let unit;
+                    if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
+                    else {
+                        const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
+                        unit = unitList;
+                        number *= multiple;
+                    }
+
+                    evaluatedSections.push(new Function(`return ${number}`)());
+                    evaluatedUnits.push(unit);
+                } else if (section.type == 'operator') {
+                    const {number, unit} = evaluateOperator(section, hiddenUnits);
+
+                    evaluatedSections.push(number);
+                    evaluatedUnits.push(unit);
+                } else if (section.type == 'function') {
+                    const {number, unit} = evaluateFunction(section, hiddenUnits);
+
+                    evaluatedSections.push(number);
+                    evaluatedUnits.push(unit);
+                }
+            }
+
+            const equals = (a, b) => a.length == b.length && a.every((v, i) => v == b[i]);
+            let value = evaluatedSections[0];
+            let unit = evaluatedUnits[0];
+
+            for (let i = 1; i < evaluatedSections.length; i++) {
+                if (operators[i - 1] == '+') value += evaluatedSections[i];
+                else if (operators[i - 1] == '-') value -= evaluatedSections[i];
+                else if (operators[i - 1] == '*') value *= evaluatedSections[i];
+                else if (operators[i - 1] == '/') value /= evaluatedSections[i];
+                else if (operators[i - 1] == '^') value **= evaluatedSections[i];
+
+                if (operators[i - 1] == '+' || operators[i - 1] == '-') {
+                    if (!equals(evaluatedUnits[0], evaluatedUnits[i])) throw new Error(unitEvaluationErrors.unitsDoNotMatch);
+                }
+                else if (operators[i - 1] == '*') unit = unit.map((v, j) => v + evaluatedUnits[i][j]);
+                else if (operators[i - 1] == '/') unit = unit.map((v, j) => v - evaluatedUnits[i][j]);
+                else if (operators[i - 1] == '^') {
+                    if (equals(evaluatedUnits[i], [0, 0, 0, 0, 0, 0, 0])) unit = unit.map(v => v * evaluatedSections[i]);
+                    else unit = [0, 0, 0, 0, 0, 0, 0];
+                }
+            }
+
+            return {number: value, unit};
+        }
+
+        function evaluateFunction(func, hiddenUnits) {
+            const {name, inputs} = func;
+
+            const values = [];
+            const units = [];
+
+            for (let i = 0; i < inputs.length; i++) {
+                const input = inputs[i];
+
+                if (typeof input == 'string') {
+                    let [number, unitString] = section.replaceAll('}', '').split('{');
+                    if (number == '') number = '0';
+
+                    let unit;
+                    if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
+                    else {
+                        const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
+                        unit = unitList;
+                        number *= multiple;
+                    }
+
+                    values.push(new Function(`return ${number}`)());
+                    units.push(unit);
+                } else if (input.type == 'operator') {
+                    const {number, unit} = evaluateOperator(input, hiddenUnits);
+
+                    values.push(number);
+                    units.push(unit);
+                } else if (input.type == 'function') {
+                    const {number, unit} = evaluateFunction(input, hiddenUnits);
+
+                    values.push(number);
+                    units.push(unit);
+                }
+            }
+
+            function functionUnits(functionName, units) {
+                switch (functionName) {
+                    case 'abs':
+                        return units[0];
+                    case 'sin':
+                    case 'cos':
+                    case 'tan':
+                    case 'asin':
+                    case 'acos':
+                    case 'atan':
+                    case 'ln':
+                    case 'log':
+                    case 'logB':
+                        return [0, 0, 0, 0, 0, 0, 0];
+                    case 'quad1':
+                    case 'quad2':
+                    case 'cubic1':
+                    case 'cubic2':
+                    case 'cubic3':
+                        return units[0].map((v, i) => units[1][i] - v);
+                }
+            }
+            
+            const result = new Function(`return ${name}(${values.join(',')});`)();
+            const unit = functionUnits(name, units);
+
+            return {number: result, unit};
+        }
+
+        function evaluateExpression({expression, hiddenUnits}) {
+            if (expression.type == 'operator') return evaluateOperator(expression, hiddenUnits);
+            else if (expression.type == 'function') return evaluateFunction(expression, hiddenUnits);
+        }
+
+        function getUnitNameFromSI(siUnits) {
+            const equals = (a, b) => a.length == b.length && a.every((v, i) => v == b[i]);
+            for (let name in unitConversions) if (equals(unitConversions[name].SIForm, siUnits) && unitConversions[name].conversionFactor == 1) return name;
+            
+            const specialUnits = {
+                [convertUnitToSI(parseUnit('W/m^2')).unit]: 'W/m^2'
+            };
+            if (specialUnits[siUnits]) return specialUnits[siUnits];
+
+            const baseUnits = ['s', 'm', 'kg', 'A', 'K', 'cd', 'mol'];
+            let positiveNames = []; let negativeNames = [];
+            let positiveValues = []; let negativeValues = [];
+            for (let i in siUnits) {
+                if (siUnits[i] < 0) {
+                    negativeNames.push(baseUnits[i]);
+                    negativeValues.push(-siUnits[i]);
+                } else if (siUnits[i] > 0) {
+                    positiveNames.push(baseUnits[i]);
+                    positiveValues.push(siUnits[i]);
+                }
+            }
+
+            const concatenatedPositives = positiveNames.map((name, i) => positiveValues[i] > 1 ? `${name}^${positiveValues[i]}` : name).join('*');
+            const concatenatedNegatives = negativeNames.map((name, i) => negativeValues[i] > 1 ? `${name}^${negativeValues[i]}` : name).join('*');
+            return concatenatedNegatives.length == 0 ? concatenatedPositives : `${concatenatedPositives}/${concatenatedNegatives}`;
         }
 
         // turns the huge unit conversions text into a datastructure
@@ -3368,7 +3569,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             error.throw = message => {
                 error.style.display = 'block';
                 error.innerHTML = message;
-            }
+            };
             solver.appendChild(error);
 
             equationSolver.appendChild(solver);
@@ -3504,6 +3705,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
                 hrClassifier.children[hrClassifier.children.length - 4].style.display = 'none';
                 hrClassifier.children[hrClassifier.children.length - 1].clear();
+
+                document.querySelector('#unitEvaluator textarea').value = '';
+                document.querySelector('#unitEvaluator #output').value = '';
+                document.querySelector('#unitEvaluator #units').value = '';
+                document.querySelector('#unitEvaluator p').value = '';
 
                 document.querySelector('#searchMenu>input').value = '';
                 document.querySelector('#searchMenu>span').clear();
@@ -3641,6 +3847,16 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             }
             hrClassifier.style.display = 'none';
 
+            // unitevaluator button
+            const unitEvaluatorButton = document.createElement('button');
+            unitEvaluatorButton.innerHTML = 'Open Unit Evaluator';
+            unitEvaluatorButton.open = false;
+            unitEvaluatorButton.onclick = () => {
+                flipDisplayValue(unitEvaluator);
+                unitEvaluatorButton.open = !unitEvaluatorButton.open;
+            }
+            unitEvaluator.style.display = 'none';
+
             // helper functions for importing
             const useImport = () => importHolder.style.display = 'block';
             const resetImport = () => {
@@ -3727,6 +3943,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(unitConverterButton);
             toolbar.appendChild(hrClassifierButton);
+            toolbar.appendChild(unitEvaluatorButton);
             toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(importUnitConversionsButton);
             toolbar.appendChild(importEquationsButton);
@@ -3738,7 +3955,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             toolbar.appendChild(keyboardShortcuts);
 
             // return mainMenu and clearAll onclick functions
-            return {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, searchButton};
+            return {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, unitEvaluatorButton, searchButton};
         }
 
         // generates the unit converter menu
@@ -3792,7 +4009,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             error.throw = message => {
                 error.style.display = 'block';
                 error.innerHTML = message;
-            }
+            };
 
             const convertButton = document.createElement('button');
             convertButton.innerHTML = 'convert';
@@ -3903,7 +4120,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             error.throw = message => {
                 error.style.display = 'block';
                 error.innerHTML = message;
-            }
+            };
 
             hrClassifier.appendChild(classifyButton);
             hrClassifier.appendChild(error);
@@ -4028,6 +4245,55 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             };
         }
 
+        function generateUnitEvaluator() {
+            const input = document.querySelector('#unitEvaluator textarea');
+            input.placeholder = 'equation to evaluate';
+            input.textInputRequired = true;
+
+            const output = document.querySelector('#unitEvaluator #output');
+            output.placeholder = 'output';
+            output.size = minimumInputSize;
+
+            const units = document.querySelector('#unitEvaluator #units');
+            units.placeholder = 'unit';
+            units.size = 10;
+
+            const evaluateButton = document.querySelector('#unitEvaluator button');
+            
+            const error = document.querySelector('#unitEvaluator p');
+            error.style.color = 'red';
+            error.style.display = 'none';
+            error.style.marginBlockEnd = '0';
+            error.throw = message => {
+                error.style.display = 'block';
+                error.innerHTML = message;
+            };
+
+            evaluateButton.onclick = () => {
+                try {
+                    const {number, unit: siUnits} = evaluateExpression(parseUnitStringExpression(input.value));
+                    const equals = (a, b) => a.length == b.length && a.every((v, i) => v == b[i]);
+    
+                    let value;
+                    if (!units.value || !equals(siUnits, convertUnitToSI(parseUnit(units.value)).unit)) {
+                        const unit = getUnitNameFromSI(siUnits);
+                        units.value = unit;
+                        value = number;
+                    } else value = convertUnit(number, getUnitNameFromSI(siUnits), units.value);
+    
+                    output.value = value;
+    
+                    output.focus();
+                } catch (e) {
+                    if (e.message == conversionErrors.factorNotFound) error.throw('Conversion factor not found.');
+                    else if (e.message == conversionErrors.prefixNotFound) error.throw('Unit prefix not found.');
+                    else if (e.message == conversionErrors.conversionNotPossible) error.throw('Conversion is not possible.');
+                    else if (e.message == unitEvaluationErrors.unitsDoNotMatch) error.throw('Units do not match (addition/subtraction).');
+                    else error.throw(`Code Error<br>${e}`);
+                }
+            };
+        }
+
         function generateNumberMemory() {
             numberMemory.style.display = 'none';
             numberMemory.appendChild(document.createElement('h1')).appendChild(document.createTextNode('Number History'));
@@ -4122,7 +4388,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         function generateKeybinds(toolbarButtons) {
-            const {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, searchButton} = toolbarButtons;
+            const {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, unitEvaluatorButton, searchButton} = toolbarButtons;
 
             body.addEventListener('keydown', event => {
                 // scroll to see active element when key is pressed
@@ -4187,6 +4453,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         unitConverter.children[unitConverter.children.length - 2].onclick();
                     else if (hrClassifierButton.open)
                         hrClassifier.children[hrClassifier.children.length - 5].onclick();
+                    else if (unitEvaluatorButton.open)
+                        deleteDefault(document.querySelector('#unitEvaluator button').onclick());
                     else if (searchButton.open)
                         document.querySelector('#searchMenu>button').onclick();
                     else {
@@ -4219,7 +4487,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                     let elementToFocus = topElement;
                     for (let i = 0; i < Number(event.key) - 1; i++) {
-                        elementToFocus = elementToFocus.nextSibling;
+                        elementToFocus = elementToFocus?.nextSibling;
                         if (elementToFocus?.style.display == 'none') i--;
                     }
                     if (elementToFocus == null) return;
@@ -4239,6 +4507,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         
                         if (unitConverterButton.open) unitConverterButton.onclick();
                         if (hrClassifierButton.open) hrClassifierButton.onclick();
+                        if (unitEvaluatorButton.open) unitEvaluatorButton.onclick();
                         if (searchButton.open) searchButton.onclick();
                         if (numberMemory.style.display == 'block') numberMemory.toggle();
                     })());
@@ -4276,6 +4545,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
                 // add a keybind where f will open the hr classifier
                 else if (event.key.toLowerCase() == keybinds.hrClassifier) deleteDefault(hrClassifierButton.onclick());
+                // add a keybind where e will open the unit evaluator
+                else if (event.key.toLowerCase() == keybinds.unitEvaluator) deleteDefault(unitEvaluatorButton.onclick());
                 // add a keybind where r will open the number memory
                 else if (event.key.toLowerCase() == keybinds.numberMemory) deleteDefault(numberMemory.toggle());
                 // add keybinds for moving through history
@@ -4314,6 +4585,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             // generate the hr classifier
             generateHRClassifier(hrInputs);
+
+            // generate the unit evaluator
+            generateUnitEvaluator();
 
             // generate number memory
             generateNumberMemory();

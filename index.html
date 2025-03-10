@@ -82,11 +82,6 @@
             width: 75vw;
             height: 75vh;
         }
-
-        #unitEvaluator textarea {
-            width: 50vw;
-            height: 50vh;
-        }
     </style>
 </head>
 <body>
@@ -109,9 +104,10 @@
     <div id="hrClassifier"></div>
     <div id="unitEvaluator">
         <h2>Unit Evaluator</h2>
-        <textarea></textarea>
+        <input id="equationinput">
         <br>
-        <span>= </span><input id="output"><input id="units">
+        <input id="output"><input id="units">
+        <br>
         <button>evaluate</button><br><br>
         <p></p>
     </div>
@@ -150,7 +146,6 @@
         };
 
         const instructionsText = `
-<b>THIS SOLVER HAS NOT BEEN TESTED! PLEASE BE AWARE THAT ANSWERS GIVEN MAY BE WRONG!</b>
 Use buttons in the Equation Selector section to filter the solvers, which are
 located in the Equation Solvers section.
 section.
@@ -3185,6 +3180,21 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             return {expression: parseStringExpression(string)[0], hiddenUnits};
         }
 
+        function evaluateNumber(section, hiddenUnits) {
+            let [number, unitString] = section.replaceAll('}', '').split('{');
+            if (number == '') number = '0';
+
+            let unit;
+            if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
+            else {
+                const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
+                unit = unitList;
+                number *= multiple;
+            }
+
+            return {number: new Function(`return ${number}`)(), unit};
+        }
+
         // evaluates a parsed operator section
         function evaluateOperator(operator, hiddenUnits) {
             const {sections, operators} = operator;
@@ -3195,18 +3205,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 const section = sections[i];
 
                 if (typeof section == 'string') {
-                    let [number, unitString] = section.replaceAll('}', '').split('{');
-                    if (number == '') number = '0';
+                    const {number, unit} = evaluateNumber(section, hiddenUnits);
 
-                    let unit;
-                    if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
-                    else {
-                        const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
-                        unit = unitList;
-                        number *= multiple;
-                    }
-
-                    evaluatedSections.push(new Function(`return ${number}`)());
+                    evaluatedSections.push(number);
                     evaluatedUnits.push(unit);
                 } else if (section.type == 'operator') {
                     const {number, unit} = evaluateOperator(section, hiddenUnits);
@@ -3256,18 +3257,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 const input = inputs[i];
 
                 if (typeof input == 'string') {
-                    let [number, unitString] = section.replaceAll('}', '').split('{');
-                    if (number == '') number = '0';
+                    const {number, unit} = evaluateNumber(section, hiddenUnits);
 
-                    let unit;
-                    if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
-                    else {
-                        const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
-                        unit = unitList;
-                        number *= multiple;
-                    }
-
-                    values.push(new Function(`return ${number}`)());
+                    values.push(number);
                     units.push(unit);
                 } else if (input.type == 'operator') {
                     const {number, unit} = evaluateOperator(input, hiddenUnits);
@@ -3312,7 +3304,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         function evaluateExpression({expression, hiddenUnits}) {
-            if (expression.type == 'operator') return evaluateOperator(expression, hiddenUnits);
+            if (typeof expression == 'string') return evaluateNumber(expression, hiddenUnits);
+            else if (expression.type == 'operator') return evaluateOperator(expression, hiddenUnits);
             else if (expression.type == 'function') return evaluateFunction(expression, hiddenUnits);
         }
 
@@ -3706,10 +3699,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 hrClassifier.children[hrClassifier.children.length - 4].style.display = 'none';
                 hrClassifier.children[hrClassifier.children.length - 1].clear();
 
-                document.querySelector('#unitEvaluator textarea').value = '';
+                document.querySelector('#unitEvaluator #equationinput').value = '';
                 document.querySelector('#unitEvaluator #output').value = '';
                 document.querySelector('#unitEvaluator #units').value = '';
-                document.querySelector('#unitEvaluator p').value = '';
+                document.querySelector('#unitEvaluator p').style.display = 'none';
 
                 document.querySelector('#searchMenu>input').value = '';
                 document.querySelector('#searchMenu>span').clear();
@@ -4246,13 +4239,14 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         function generateUnitEvaluator() {
-            const input = document.querySelector('#unitEvaluator textarea');
+            const input = document.querySelector('#unitEvaluator #equationinput');
+            input.style.width = '50vw';
             input.placeholder = 'equation to evaluate';
             input.textInputRequired = true;
 
             const output = document.querySelector('#unitEvaluator #output');
             output.placeholder = 'output';
-            output.size = minimumInputSize;
+            output.size = 20;
 
             const units = document.querySelector('#unitEvaluator #units');
             units.placeholder = 'unit';
@@ -4282,8 +4276,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     } else value = convertUnit(number, getUnitNameFromSI(siUnits), units.value);
     
                     output.value = value;
-    
                     output.focus();
+
+                    error.style.display = 'none';
                 } catch (e) {
                     if (e.message == conversionErrors.factorNotFound) error.throw('Conversion factor not found.');
                     else if (e.message == conversionErrors.prefixNotFound) error.throw('Unit prefix not found.');

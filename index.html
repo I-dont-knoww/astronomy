@@ -94,6 +94,8 @@
         <hr>
     </div>
 
+    <div id="instructionsHolder" style="display: none"></div>
+
     <h2>Equation Selector</h2>
     <div id="equationSelector"></div>
     <hr>
@@ -146,58 +148,146 @@
         };
 
         const instructionsText = `
-Use buttons in the Equation Selector section to filter the solvers, which are
-located in the Equation Solvers section.
-section.
-Bolded buttons in the Equation Selector section will lead directly to one solver,
-while unbolded buttons will lead to a category of solvers.
-To show all solvers, press the Go to Main Menu button in the Tool Bar section.
-To clear the inputs of every solver, press the Clear All button in the Tool Bar section.
-To use a solver, fill out all relevant inputs using known information and then
-press the solve button. The program will solve for the missing input.
-If an expression is put as an input (ie 2 + 2), the solver will evaluate the expression
-and use that value to continue solving.
-<b>WARNING: The exponentation operator used by the solver is not ^, it is **.
-To do 2 * 2 * 2 * 2, the correct expression would be 2 ** 4.</b>
-The program cannot solve for more than one input and will give an error accordingly.
-A solution may have two possible values, in which solved input will have several
-answers separated by commas.
-Sometimes a value will be NaN, which stands for Not a Number. This does not necessarily
-mean that there was a bug in the code - it could mean a domain error (ie eccentricity was
-negative).
-To open the search menu, press the Search Equations button. A menu will pop up with
-an input field. Putting units separated by semicolons and then pressing the search
-button will allow you to search all solvers with those exact units.
-To open a unit converter, press the Convert Units button. A menu will pop up where
-you can fill out a value, its unit, and a unit to convert to. Pressing convert
-will then convert that value you inputted. Pressing the Convert Units button again
-will close the menu.
-Units in the unit converter are in the form of
-unita1*unita2* ... *unitaN/unitb1*unitb2* ... *unitbK, ie:
-m/s, mi/hr, km/s*Mpc
-<b>Some units are not supported because I forgot to add them or were too hard to add
-(ie Celsius, Fahrenheit)</b>
-To open the HR classification menu, press the Open HR Classifier button. In the HR
-classification menu, you may input various variables of the star or the color of the
-star. Pressing the classify button at the bottom of the menu will make the program
-find a classification that matches your inputted variables as closely as possible.
-You can put filters for various star classes in the Stellar Classification input.
-For example, putting 'F' in the input will only search for stars in class F. Putting
-'F|M' in the input will make the program search in both the F or the M classes. Putting
-'F&Ia0' in the input will make the program search for class F stars that are also Ia0.
-If several stars all are equally 'close' to the values you inputted then it will choose
-the one that appears first in the long list it looks in. The color selector values stars
-based on how different their RGB values are. Hovering over the Stellar Classification input
-will give you a brief description of what that Stellar Classification means, and hovering
-over the color selector will give you the RGB values of it. The absorption spectra created
-by the program is actually just an absorption spectra of a main sequence star with a similar
-temperature.
-To import a new set of units/equations, press the corresponding button.
-To find out how to make an import, ask someone who knows or read the documentation.
-<b>Importing a new set of units/equations will persist even after you close the tab!
-If you messed up an import, press ctrl + shift + j and type the following command:
-localStorage.equations = localStorage.unitConversions = '';</b>
-        `.trim().replaceAll('\n', '<br>');
+<h3>Instructions</h3>
+This is a guide on how to use the astronomy solver, which will be written in the form of a guided tour.
+This tour will walk you through the steps to solve a simple astronomy physics problem using the astronomy solver.
+It will be assumed that you are relatively familiar with solving astronomy physics problems.
+It is recommended that you follow this guide with the astronomy solver opened on a different tab as the large instructional text may be annoying.<br>
+<h4>The Problem</h4>
+Suppose that we have a star with a luminosity of <b>13000</b> solar luminosities and a radius of <b>1.94 * 10^7 mi</b>.<br>
+a. Provide the <b>radius</b> of the star in <b>solar radii</b>.<br>
+b. Solve for the <b>temperature</b> of the star in K.<br>
+c. Provide the <b>spectral class</b> of the star.<br>
+d. Given that the <b>mass</b> of the star is <b>9.7 solar masses</b>, calculate the <b>density</b> of the star.<br>
+<h4>Part A</h4>
+To solve for the radius of the star in solar radii, we can use the unit converter.
+First, open the unit converter by pressing the <b>'Convert Units'</b> button or by pressing <b>'${keybinds.unitConverter}'</b> on your keyboard.
+Then, in the box labeled 'value 1' type in <b>1.94 * 10 ** 7</b> or <b>1.94e7</b>.
+Note the use of 'e' as a shortcut for scientific notation.<br><br>
+You can put mathematical expressions as inputs for most input boxes.
+Parenthesis are supported and you use +, -, *, /, and ** for addition, subtraction, multiplication, division, and exponentiation respectively.
+<b style="color: red">Note that rather than using '^' to represent exponentiation, you must use '**'.</b>
+You may also use certain constants in the mathematical expressions.
+A couple of common ones would include c (speed of light), G (gravitational constant), and PI (π).
+Note that sometimes, typing a constant or number will require you to type in letters that are occupied by keybinds.
+To bypass the keybind system, hold <b>'Alt'</b> while typing (eg. to type 1e10, type out 1, hold <b>'Alt'</b>, type e, unhold <b>'Alt'</b>, and type out 10).<br><br>
+Next, in the box labeled <b>'unit 1'</b> type in <b>'mi'</b>, and in the box labeled <b>'unit 2'</b> type in <b>'Rs'</b>.
+Notice that <b>'Rs'</b> stands for 'solar radius'.
+Similarly, <b>'Ms'</b> stands for 'solar mass', <b>'Ts'</b> stands for 'solar temperature', and <b>'Ls'</b> stands for 'solar luminosity'.
+Moreover, <b>'Me'</b> stands for 'earth mass', <b>'Re'</b> stands for 'earth radius', <b>'Mj'</b> stands for 'jupiter mass', and <b>'Rj'</b> stands for 'jupiter radius'.
+Do note that these units only exist for earth, jupiter, and the sun.
+Finally, press the button labeled <b>'convert'</b>. The answer should appear in the box labeled <b>'value 2'</b>.<br><br>
+Units in the solver can only be represented in the form of unit1a^a1*unit2a^a2*...*unitNa^aN/unit1b^b1*unit2b^b2*...*unitK^bK, where N and K are positive integers, a1-aN are integers, and b1-bN, and unit1a-unitNa and unit1b-unitNb are valid units (eg. m, mi, s, yr).
+For example, a few valid units would be m/s^2, m*s^-2, and km/s*Mpc. Do note that multiple divisions (/) are not supported.
+Note that ^ is used here for exponentiation rather than **, unlike in the rest of the solver.
+One commonly confused unit symbol is that of the astronomical unit. The symbol au is used rather than AU.
+Alternatively, you could've pressed the <b>'Enter'</b> key on your keyboard, which solves for the empty input, whether it be the one labeled value 1 or value 2 or solves for the one currently focused.
+For example, if you accidentally put <b>'m'</b> instead of <b>'mi'</b> into the box labeled <b>'unit 1'</b> and pressed the solve button, instead of clearing the box labeled <b>'value 2'</b>, changing the box labeled <b>'unit 1'</b>, and pressing solve again, you can just change the box labeled <b>'unit 1'</b> and press the <b>'Enter'</b> key while focused on the box labeled <b>'value 2'</b>.
+Note that the term <b>'focused'</b> means that the cursor is currently in the box and the border of the box is bolded.<br><br>
+Now that we have the radius of the star in solar radii, we should reset the solver.
+First, press the button labeled <b>'Clear All'</b> or press <b>'${keybinds.clearAll}'</b> on your keyboard.
+Then, close the unit converter by hitting the button labeled <b>'Convert Units'</b> or by pressing <b>'${keybinds.unitConverter}'</b> on your keyboard.
+<h4>Part B</h4>
+The simplest way to solve for the temperature of the star would be to use the Stefan-Boltzmann equation.
+First, we must find the equation solver for the Stefan-Boltzmann equation.
+There are several ways to do this.<br><br>
+One way is to open the search menu either by pressing the button labeled <b>'Search Equations'</b> or by pressing <b>'${keybinds.searchMenu}'</b> on your keyboard.
+In the menu that opens up, type in <b>'h#stefan boltz'</b> and press the button labeled <b>'search'</b> or hit enter.
+The equation solvers should be filtered such that only solvers titled 'Stefan-Boltzmann' will appear.<br><br>
+In the search query, the symbol <b>'h#'</b> tells the program that we are searching for titles and the letters afterward tell the program what we are searching for.
+Some other symbols that are available for searching are <b>'c'</b> for category and <b>'u'</b> for units.
+We can also combine these symbols for a more advanced search.
+For example, to search for the equation corresponding to transit length, we can use the search term <b>'c#transit\\h#len'</b>.
+Notice the \\ separating the categories.
+We can also use the equation searcher to find an equation we may not know the name of.
+For example, suppose that we didn't know that we were supposed to use the Stefan-Boltzmann equation.
+Since we are given units of luminosity and length, and asked to find temperature, we can search for equation solvers that relate variables with those units.
+For example, we can use the search term <b>'u#W;m;K'</b>.
+Notice that the units are separated by semicolons.
+Also notice that any unit of luminosity, length, and temperature would have worked. For example, using <b>'u#Ls;Rs;Ts'</b> would produce the same results.<br><br>
+Another way to find the equation solver for the Stefan-Boltzmann equation is to look through the categories listed in the <b>'Equation Selector'</b>.
+Pressing the category labeled <b>'Stefan-Boltzmann'</b> will give you the Stefan-Boltzmann equations.<br><br>
+To use the Stefan-Boltzmann equation solver, fill in the inputs corresponding to radius and luminosity, leaving the box for temperature empty.
+If your cursor is not focused on anything, then you may press any number <b>1-9</b> to focus on the equation solver n solvers down, where n is the number you pressed.
+Note that there are several Stefan-Boltzmann equation solvers. Use the one that provides inputs for luminosity, radius, and temperature.
+Then, fill in the boxes <b>next</b> to the boxes for luminosity and radius with the correct <b>units</b> of luminosity and radius (Ls and Rs/mi depending on what radius you put in for stellar radius).
+You may press <b>'${keybinds.inputBack}'</b> and <b>'${keybinds.inputForward}'</b> to move back and forth between input boxes.
+Note that the solver will automatically convert from the default units in the placeholder (the grey text in the units box) to the unit you put into the box.<br><br>
+A way to speed up filling the boxes if you already have copy-pasted it before or it was the result that you acquired from the program (eg. the result you got after converting units) is to use the <b>'Number History'</b> tool.
+Open the number history tool by pressing <b>'${keybinds.numberMemory}'</b> on your keyboard. Note that there is no button in the toolbar to open it.
+In the number history, there should be the value <b>44.877...</b> with a unit of <b>Rs</b>.
+The numbers in the number history are sorted such that numbers that most recently appeared are placed at the top of the history.
+Pressing <b>'ctrl + c'</b> will copy the number in the row with the blue highlight, and pressing <b>'${keybinds.inputBack}'</b> and <b>'${keybinds.inputForward}'</b> will move index on the side up and down, moving backwards/forwards through the number history.
+Alternatively, focusing on the radius text box and hitting the <b>up arrow key</b> will prompt the program to search through the number history and provide a number and a unit that fits with the input (in this case a unit of length).
+Hitting up arrow repeatedly will go through (in this case) the numbers with units of length in the number history from youngest to oldest, and hitting the down arrow will go through from oldest to youngest.<br><br>
+Once you have filled all the known inputs, press the <b>'solve'</b> button or press <b>'Enter'</b> on your keyboard to solve for the missing input. The answer should appear in the empty box promptly.<br><br>
+If all the inputs of an equation solver are filled, pressing the <b>'solve'</b> button will give an error.
+On the contrary, pressing <b>'Enter'</b>, if focused on an input box, will use the other variables to solve for that input box, as if the one focused was empty.
+Sometimes, there may be several possible answers for a variable. In that case, the program will separate each answer with a comma.
+Occasionally, your answer may be NaN, which stands for <b>'Not a Number'</b>. This could either mean that some of your inputs are invalid (eg. eccentricity less than zero, inclination angle greater than 90 degrees) or mean that the program is malfunctioning.
+If you wish to see your number in <b>scientific mode</b>, press <b>'${keybinds.numberMode}'</b> on your keyboard.
+You should see the mode on the top right of your screen change to 'scientific'.
+Switching back is as easy as just pressing <b>'${keybinds.numberMode}'</b> again.
+Hovering over one of the input boxes will show the equation used to solve for that variable.
+The equation can be used to <b>show work</b> for tests that require it.
+For many tests, simply writing down the equation (even without plugging in the numbers for the variables) and equating it to the answer (eg. A = 4πr^2 = 5)<br><br>
+Afterwards solving for the answer, reset the solver.
+Press the button labeled <b>'Clear All'</b> or press <b>'${keybinds.clearAll}'</b> on your keyboard and then go to the main menu by pressing the button labeled <b>'Go to Main Menu'</b> or by pressing <b>'${keybinds.mainMenu}'</b>.
+<h4>Part C</h4>
+To find the spectral class of the star, we can use the HR classifier tool.
+First, open up the HR classifier by pressing the <b>'Open HR Classifier'</b> button or by hitting <b>'${keybinds.hrClassifier}'</b> on your keyboard.<br><br>
+The HR classifier finds a classification that is closest to all inputs (all the empty input boxes that show up when you open the menu).
+For example, putting 10 solar masses into the <b>'Mass'</b> input box and pressing the <b>'classify'</b> button or pressing <b>'Enter'</b> will find a classification with a mass closest to 10 solar masses.
+The 'input box' of sorts underneath the input labeled <b>'Bolometric Magnitude'</b> allows you to select a color, which will prompt the program to find a classification closest to that color.<br><br>
+The input box labeled <b>'Stellar Classification'</b> can be used as a filter to exclude certain classifications.
+The classification system includes tokens and operators.
+The operators are merely boolean operators - and (&), or (|), and not (!).
+The tokens are what the program will search for.
+For example, putting in <b>'Ia'</b> means that the program will only allow classifications with an <b>'Ia'</b> in them as an answer.
+There are also special tokens which will search for a group of classifications. For example, the token <b>'dwarf'</b> will search for dwarf stars only.
+<b style="color: red">It is recommended that you use the special tokens rather than typing out what to search for.</b>
+For example, dwarf stars have a classification of <b>'V'</b>. Suppose you used the token <b>'V'</b> to filter the classifications.
+However, the classifications <b>'IV'</b> and <b>'VI'</b> also have a <b>'V'</b> in them, rendering the filter inaccurate.
+The following special tokens are provided:
+<ul><li>mainsequencestar: ensures that the spectral class is O, B, A, F, G, K, or M.</li>
+<li>supergiantstar: ensures that the luminosity class is either Ia or Ib.</li>
+<li>giantstar: ensures that the luminosity class is not 'V' or 'VI' (so greater than 'V').</li>
+<li>whitedwarf: ensures that the luminosity class is 'D'.</li>
+<li>subdwarf: ensures that the luminosity class is 'IV'.</li>
+<li>dwarf: ensures that the luminosity class is 'V'.</li>
+<li>subgiant: ensures that the luminosity class is 'IV'.</li>
+<li>normalgiant: ensures that the luminosity class is 'III'.</li>
+<li>brightgiant: ensures that the luminosity class is 'II'.</li>
+<li>lessluminoussupergiant: ensures that the luminosity class is 'Ib'.</li>
+<li>luminoussupergiant: ensures that the luminosity class is 'Ia'.</li>
+<li>hypergiant: ensures that the luminosity class is 'Ia0'.</li></ul>
+Suppose you were trying to find the exact classification of a class M giant with a mass of 5 solar masses.
+You would use the filter <b>'M&normalgiant'</b> and put 5 solar masses into the correct input box.
+<b>'M&normalgiant'</b> just means that there must be an <b>'M'</b> in the final classification <b>and</b> it must have a luminosity class of <b>III</b>.<br><br>
+To classify your star, press the button labeled <b>'classify'</b> or hit <b>'Enter'</b> on your keyboard.
+After classifying, the program will update every input box with a value that fits that classification (not necessarily your original numbers).
+In the input box labeled <b>'Stellar Classification'</b>, the class of your star will be displayed.
+Hovering over that input box will provide a 'description' of sorts of the classification.
+Underneath the button labeled <b>'classify'</b>, an absorption spectra of a <b style="color: red">main sequence star</b> with a spectral class close to your classification will be displayed.
+Hovering over the spectra will let display the wavelengths of light for the color at your mouse pointer and some possible sources of absorption for that color.
+Clicking will copy the current wavelength your mouse is at.<br><br>
+Now, to solve part C of the problem, all we have to do is input our known information about the star (its radius, temperature, and mass) and ask the program to classify it.
+<h4>Part D</h4>
+Calculating the density with the mass can easily be done with the equation solvers, but for the sake of introducing new stuff we'll use the unit evaluator tool instead.
+The unit evaluator works like a normal calculator except that it tracks units while calculating.
+The evaluator uses +, -, *, /, and ** as addition, subtraction, multiplication, division, and exponentiation respectively.
+When inputting numbers, you have the option to add a unit in brackets behind them.
+It is imperative that you do not put a space between the actual number and the brackets.
+For example 3 meters would become 3[m] in the unit evaluator.
+You can then perform operations on those units (eg. 3[m] + 1[m], 5[m]/3[s]).
+After you put your equation in the input box labeled <b>'equation to evaluate'</b>, you can press the button labeled <b>'evaluate'</b> or hit the <b>'Enter'</b> key on your keyboard.
+The result of the calculation will appear in the box labeled <b>'output'</b> and its units will appear in the box labeled <b>'unit'</b>.
+You may put in a unit to convert to into the unit box and the output will be automatically converted to that unit.
+However if your inputted unit doesn't match up, the an auto-generated correct SI unit will override your inputted unit (eg. if you put feet as the unit to convert to, but the number that came out had a unit of time, the program will put seconds as the unit instead).<br><br>
+To open the unit evaluator, press the button labeled <b>'Open Unit Evaluator'</b> or press the <b>'${keybinds.unitEvaluator}'</b> key on your keyboard.
+To calculate the density, type in <b>'9.7[Ms] / ((4/3) * PI * (1.94e7[mi]) ** 3)'</b> into the input box labeled <b>'equation to evaluate'</b>.
+Then, press enter to receive your output.
+        `.trim().replaceAll('\n', ' ');
 
         const keyboardShortcutsText = `
 Pressing the enter key will 'press' every single solve button currently on the screen,
@@ -2680,6 +2770,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const body = document.querySelector('body');
         const headers = document.getElementById('headers');
         const toolbar = document.getElementById('toolbar');
+        const instructionsHolder = document.getElementById('instructionsHolder');
         const equationSelector = document.getElementById('equationSelector');
         const equationSolver = document.getElementById('equationSolver');
         const unitConverter = document.getElementById('unitConverter');
@@ -3175,6 +3266,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     string = string.replaceAll(`[${unit}]`, `{${unitsReplaced}}`);
                     unitsReplaced++;
                 }
+            }
+
+            for (let i = 0; i < string.length; i++) if (string[i] == '-' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1]))) {
+                string = string.slice(0, i) + '(-1)*' + string.slice(i + 1);
             }
 
             return {expression: parseStringExpression(string)[0], hiddenUnits};
@@ -3918,7 +4013,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             // button that shows the instructions
             const instructionsButton = document.createElement('button');
             instructionsButton.innerHTML = '<b>Instructions</b>';
-            instructionsButton.onclick = () => flipDisplayValue(instructions);
+            instructionsButton.onclick = () => {
+                flipDisplayValue(instructions);
+                if (instructions.style.display == 'none' && keyboardShortcuts.style.display == 'none') instructionsHolder.style.display = 'none';
+                else instructionsHolder.style.display = 'block';
+            };
 
             // keyboard shortcuts text
             const keyboardShortcuts = document.createElement('p');
@@ -3928,7 +4027,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             // button that shows the keyboard shortcuts
             const keyboardShortcutsButton = document.createElement('button');
             keyboardShortcutsButton.innerHTML = '<b>Keyboard Shortcuts</b>';
-            keyboardShortcutsButton.onclick = () => flipDisplayValue(keyboardShortcuts);
+            keyboardShortcutsButton.onclick = () => {
+                flipDisplayValue(keyboardShortcuts);
+                if (instructions.style.display == 'none' && keyboardShortcuts.style.display == 'none') instructionsHolder.style.display = 'none';
+                else instructionsHolder.style.display = 'block';
+            };
 
             toolbar.appendChild(mainMenuButton);
             toolbar.appendChild(clearAllButton);
@@ -3944,8 +4047,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             toolbar.appendChild(document.createElement('br'));
             toolbar.appendChild(instructionsButton);
             toolbar.appendChild(keyboardShortcutsButton);
-            toolbar.appendChild(instructions);
-            toolbar.appendChild(keyboardShortcuts);
+            instructionsHolder.appendChild(instructions);
+            instructionsHolder.appendChild(keyboardShortcuts);
+            instructionsHolder.appendChild(document.createElement('hr'));
 
             // return mainMenu and clearAll onclick functions
             return {mainMenuButton, clearAllButton, unitConverterButton, hrClassifierButton, unitEvaluatorButton, searchButton};
@@ -4098,7 +4202,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             const colorInput = document.createElement('input');
             colorInput.type = 'color';
             colorInput.onchange = () => colorInput.hoverText = `rgb(${hexToRGB(colorInput.value).join(', ')})`; colorInput.onchange();
-            colorInput.style.width = '64ch';
+            colorInput.style.width = '64.3ch';
             hrClassifier.appendChild(colorInput);
             hrClassifier.appendChild(document.createElement('br'));
             hrClassifier.appendChild(document.createElement('br'));
@@ -4277,6 +4381,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     } else value = convertUnit(number, getUnitNameFromSI(siUnits), units.value);
     
                     output.value = numberMode(value);
+                    numberMemory.add(output.value, units.value, 'N/A');
                     output.focus();
 
                     error.style.display = 'none';
@@ -4471,6 +4576,11 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 if (event.altKey && event.key != 'Alt' && event.key.length == 1) deleteDefault(document.activeElement.value += event.key);
 
                 // custom shortcuts begin here
+
+
+                // if they're trying to use an actual keyboard shortcut let them
+                if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
+                
                 // equation solver selector by pressing a number while the active element is the body
                 if (!isNaN(event.key) && document.activeElement == body) {
                     event.preventDefault();
@@ -4490,13 +4600,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                     elementToFocus.children[1].focus();
                     return;
-                }
-
-                // if they're trying to use an actual keyboard shortcut let them
-                if (event.ctrlKey || event.altKey || event.shiftKey || event.metaKey) return;
-                
+                }                
                 // add a keybind where a will go to main menu
-                if (event.key.toLowerCase() == keybinds.mainMenu) {
+                else if (event.key.toLowerCase() == keybinds.mainMenu) {
                     deleteDefault((() => {
                         scroll({top: 0, left: 0, behavior: 'smooth'});
                         mainMenuButton.onclick();

@@ -347,6 +347,7 @@ d: 1e-1
 
         let unitConversionsRaw = localStorage.unitConversions || `
 0,0,0,0,0,0,0;no units;1
+0,0,0,0,0,0,0;%;0.01
 0,0,0,0,0,0,0;rad;1
 0,0,0,0,0,0,0;rot;6.283185307179586
 0,0,0,0,0,0,0;deg;0.017453292519943295
@@ -3066,7 +3067,8 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             if (isStringFunction(string)) return parseStringFunction(string);
             if (!/\+|\-|\*|\/|\^/.test(string)) {
-                if (string.startsWith('$')) string = '-' + string.slice(1);
+                string = string.replace('$', '-');
+                string = string.replace('#', '-');
                 return string;
             }
 
@@ -3108,8 +3110,12 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
             }
 
-            for (let i = 0; i < string.length; i++) if (string[i] == '-' && string[i + 1] != '(' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1])))
-                string = string.slice(0, i) + '$' + string.slice(i + 1);
+            for (let i = 0; i < string.length; i++) {
+                if (string[i] == '-' && string[i + 1] != '(' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1])))
+                    string = string.slice(0, i) + '$' + string.slice(i + 1);
+                if (string[i] == '-' && string[i - 1] == 'e')
+                    string = string.slice(0, i) + '#' + string.slice(i + 1);
+            }
 
             const expressions = string.split('@');
             return expressions.map(expression => parseOperators(expression));
@@ -3272,7 +3278,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
             }
 
-            for (let i = 0; i < string.length; i++) if (string[i] == '-' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1]))) {
+            for (let i = 0; i < string.length; i++) if (string[i] == '-' && string[i - 1] != 'e' && (i == 0 || /\+|\-|\*|\/|\^/.test(string[i - 1]))) {
                 string = string.slice(0, i) + '(-1)*' + string.slice(i + 1);
             }
 
@@ -4354,7 +4360,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             const output = document.querySelector('#unitEvaluator #output');
             output.placeholder = 'output';
-            output.size = 20;
+            output.size = 30;
 
             const units = document.querySelector('#unitEvaluator #units');
             units.textInputRequired = true;

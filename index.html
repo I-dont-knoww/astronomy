@@ -3290,6 +3290,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         function evaluateNumber(section, hiddenUnits) {
             let [number, unitString] = section.replaceAll('}', '').split('{');
             if (number == '') number = '0';
+            number = new Function(`return ${number}`)();
 
             let unit;
             if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
@@ -3299,7 +3300,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 number *= multiple;
             }
 
-            return {number: new Function(`return ${number}`)(), unit};
+            return {number, unit};
         }
 
         // evaluates a parsed operator section
@@ -3364,7 +3365,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 const input = inputs[i];
 
                 if (typeof input == 'string') {
-                    const {number, unit} = evaluateNumber(section, hiddenUnits);
+                    const {number, unit} = evaluateNumber(input, hiddenUnits);
 
                     values.push(number);
                     units.push(unit);

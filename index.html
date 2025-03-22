@@ -4398,7 +4398,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                     } else value = convertUnit(number, getUnitNameFromSI(siUnits), units.value);
     
                     output.value = numberMode(value);
-                    numberMemory.add(output.value, units.value, 'N/A');
+                    numberMemory.add(output.value, units.value, input.value);
                     output.focus();
 
                     error.style.display = 'none';
@@ -4451,7 +4451,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 }
             }
 
-            numberMemory.toggle = () => numberMemory.style.display = numberMemory.style.display == 'none' ? 'block' : 'none';
+            numberMemory.toggle = () => {
+                numberMemory.style.display = numberMemory.style.display == 'none' ? 'block' : 'none';
+                if (numberMemory.style.display == 'none') numberMemoryIndex = 0;
+            };
             numberMemory.moveForward = () => {
                 numberMemoryIndex++;
                 redraw();
@@ -4522,7 +4525,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 // make it so copying anything puts it into the number memory
                 if (event.code == 'KeyC' && event.ctrlKey) {
                     if (numberMemory.style.display == 'block') {
-                        deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].number));
+                        if (event.shiftKey) deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].notes));
+                        else if (event.altKey) deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].units));
+                        else deleteDefault(navigator.clipboard.writeText(numberMemoryList[numberMemoryIndex].number));
                     }
                     else if (getSelection().toString().length > 0)
                         numberMemory.add(getSelection().toString(), (document.activeElement?.unit) ? (document.activeElement.nextSibling.value || document.activeElement.unit) : '', document.activeElement?.placeholder);

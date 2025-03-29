@@ -5,6 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="favicon.ico">
 
+    <meta name="description" content="A program that helps with the math section of the Astronomy event at Science Olympiad.">
+    <meta name="keywords" content="science olympiad, astronomy">
+
     <title>Astronomy Solver</title>
 
     <style>
@@ -4453,7 +4456,10 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
             numberMemory.toggle = () => {
                 numberMemory.style.display = numberMemory.style.display == 'none' ? 'block' : 'none';
-                if (numberMemory.style.display == 'none') numberMemoryIndex = 0;
+                if (numberMemory.style.display == 'none') {
+                    numberMemoryIndex = 0;
+                    redraw();
+                }
             };
             numberMemory.moveForward = () => {
                 numberMemoryIndex++;

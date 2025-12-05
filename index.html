@@ -4683,7 +4683,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 // add a keybind where a will go to main menu
                 else if (event.key.toLowerCase() == keybinds.mainMenu) {
                     deleteDefault((() => {
-                        scroll({ top: 0, left: 0, behavior: 'smooth' });
+                        scroll({ top: 0, left: 0 });
                         mainMenuButton.onclick();
 
                         if (unitConverterButton.open) unitConverterButton.onclick();

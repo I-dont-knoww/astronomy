@@ -198,7 +198,7 @@ Parenthesis are supported and you use +, -, *, /, and ** for addition, subtracti
 You may also use certain constants in the mathematical expressions.
 A couple of common ones would include c (speed of light), G (gravitational constant), and PI (π).
 Note that sometimes, typing a constant or number will require you to type in letters that are occupied by keybinds.
-To bypass the keybind system, hold <b>'Alt'</b> while typing (eg. to type 1e10, type out 1, hold <b>'Alt'</b>, type e, unhold <b>'Alt'</b>, and type out 10).<br><br>
+To bypass the keybind system, press <b>\`</b> to toggle the keybinds on and off.<br><br>
 Next, in the box labeled <b>'unit 1'</b> type in <b>'mi'</b>, and in the box labeled <b>'unit 2'</b> type in <b>'Rs'</b>.
 Notice that <b>'Rs'</b> stands for 'solar radius'.
 Similarly, <b>'Ms'</b> stands for 'solar mass', <b>'Ts'</b> stands for 'solar temperature', and <b>'Ls'</b> stands for 'solar luminosity'.
@@ -1556,6 +1556,20 @@ DO: diameter of objective
 f / O
 F * O
 f / F
+\\
+Kelvin-Helmholtz Time Scale
+Main
+tMRL
+τ_th;M;R;L
+s;kg;m;W
+τth: thermal time scale
+M: mass of star
+R: radius of star
+L: luminosity of star
+(G * (M ** 2)) / (2 * R * L)
+((2 * t * R * L) / G) ** 0.5
+(G * (M ** 2)) / (2 * t * L)
+(G * (M ** 2)) / (2 * t * R)
 `).trim();
 
         const specialClassifications = {

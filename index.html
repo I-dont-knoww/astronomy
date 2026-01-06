@@ -205,13 +205,13 @@ Similarly, <b>'Ms'</b> stands for 'solar mass', <b>'Ts'</b> stands for 'solar te
 Moreover, <b>'Me'</b> stands for 'earth mass', <b>'Re'</b> stands for 'earth radius', <b>'Mj'</b> stands for 'jupiter mass', and <b>'Rj'</b> stands for 'jupiter radius'.
 Do note that these units only exist for earth, jupiter, and the sun.
 Finally, press the button labeled <b>'convert'</b>. The answer should appear in the box labeled <b>'value 2'</b>.<br><br>
-Units in the solver can only be represented in the form of unit1a^a1*unit2a^a2*...*unitNa^aN/unit1b^b1*unit2b^b2*...*unitK^bK, where N and K are positive integers, a1-aN are integers, and b1-bN, and unit1a-unitNa and unit1b-unitNb are valid units (eg. m, mi, s, yr).
-For example, a few valid units would be m/s^2, m*s^-2, and km/s*Mpc. Do note that multiple divisions (/) are not supported.
-Note that ^ is used here for exponentiation rather than **, unlike in the rest of the solver.
-One commonly confused unit symbol is that of the astronomical unit. The symbol au is used rather than AU.
 Alternatively, you could've pressed the <b>'Enter'</b> key on your keyboard, which solves for the empty input, whether it be the one labeled value 1 or value 2 or solves for the one currently focused.
 For example, if you accidentally put <b>'m'</b> instead of <b>'mi'</b> into the box labeled <b>'unit 1'</b> and pressed the solve button, instead of clearing the box labeled <b>'value 2'</b>, changing the box labeled <b>'unit 1'</b>, and pressing solve again, you can just change the box labeled <b>'unit 1'</b> and press the <b>'Enter'</b> key while focused on the box labeled <b>'value 2'</b>.
 Note that the term <b>'focused'</b> means that the cursor is currently in the box and the border of the box is bolded.<br><br>
+Units in the solver can only be represented in the form of unit1a^a1*unit2a^a2*...*unitNa^aN/unit1b^b1*unit2b^b2*...*unitK^bK, where N and K are positive integers, a1-aN are integers, and b1-bN, and unit1a-unitNa and unit1b-unitNb are valid units (eg. m, mi, s, yr).
+For example, a few valid units would be m/s^2, m*s^-2, and km/s*Mpc. Do note that multiple divisions (/) are not supported.
+Note that ^ is used here for exponentiation rather than **, unlike in the rest of the solver.
+One commonly confused unit symbol is that of the astronomical unit. The symbol au is used rather than AU.<br><br>
 Now that we have the radius of the star in solar radii, we should reset the solver.
 First, press the button labeled <b>'Clear All'</b> or press <b>'${keybinds.clearAll}'</b> on your keyboard.
 Then, close the unit converter by hitting the button labeled <b>'Convert Units'</b> or by pressing <b>'${keybinds.unitConverter}'</b> on your keyboard.
@@ -3721,6 +3721,9 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                 solver.appendChild(input);
                 solver.appendChild(unitInput);
                 solver.appendChild(document.createElement('br'));
+
+                input.addEventListener('change', () => numberMemory.add(input.value, unitInput.value || input.unit, 'N/A'));
+                unitInput.addEventListener('change', () => { if (input.value) numberMemory.add(input.value, unitInput.value || input.unit, 'N/A') });
             }
 
             // create the button that will solve given the inputs
@@ -4178,8 +4181,13 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             unit2.size = 10;
 
             inBetweenText.updateHoverText(unit1.value, unit2.value);
-            unit1.addEventListener('change', () => inBetweenText.updateHoverText(unit1.value, unit2.value));
-            unit2.addEventListener('change', () => inBetweenText.updateHoverText(unit1.value, unit2.value));
+            unit1.onchange = () => inBetweenText.updateHoverText(unit1.value, unit2.value);
+            unit2.onchange = () => inBetweenText.updateHoverText(unit1.value, unit2.value);
+
+            input1.addEventListener('change', () => { if (unit1.value) numberMemory.add(input1.value, unit1.value, 'N/A') });
+            input2.addEventListener('change', () => { if (unit2.value) numberMemory.add(input2.value, unit2.value, 'N/A') });
+            unit1.addEventListener('change', () => { if (input1.value) numberMemory.add(input1.value, unit1.value, 'N/A') });
+            unit2.addEventListener('change', () => { if (input2.value) numberMemory.add(input2.value, unit2.value, 'N/A') });
 
             const error = document.createElement('p');
             error.style.color = 'red';
@@ -4600,7 +4608,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
                         numberMemory.add(getSelection().toString(), (document.activeElement?.unit) ? (document.activeElement.nextSibling.value || document.activeElement.unit) : '', document.activeElement?.placeholder);
                 }
 
-                if (event.code == 'ArrowUp' && document.activeElement.isSolverInput) {
+                if (event.code == 'ArrowUp' && (document.activeElement.isSolverInput || document.activeElement.isConverter)) {
                     const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
                     const element = document.activeElement;
 
@@ -4608,31 +4616,45 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
 
                     let history;
                     for (history = element.history + 1; history < numberMemoryList.length; history++) {
-                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
-                        const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
+                        try {
+                            const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
+                            const unit2 = element.unit ? convertUnitToSI(parseUnit(element.unit)).unit : [];
 
-                        if (equals(unit1, unit2)) {
-                            element.value = numberMemoryList[history].number;
-                            element.nextSibling.value = numberMemoryList[history].unit ?? '';
-                            element.history = history;
-                            return;
+                            if (unit2.length == 0 || equals(unit1, unit2)) {
+                                element.value = numberMemoryList[history].number;
+                                element.nextSibling.value = numberMemoryList[history].unit ?? '';
+                                element.history = history;
+
+                                if (element.isConverter) element.nextSibling.onchange();
+
+                                return;
+                            }
+                        } catch {
+                            continue;
                         }
                     }
                 }
-                if (event.code == 'ArrowDown' && document.activeElement.isSolverInput) {
+                if (event.code == 'ArrowDown' && (document.activeElement.isSolverInput || document.activeElement.isConverter)) {
                     const equals = (a, b) => a.length == b.length ? a.every((v, i) => v == b[i]) : false;
                     const element = document.activeElement;
 
                     let history;
                     for (history = element.history - 1; history >= 0; history--) {
-                        const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
-                        const unit2 = convertUnitToSI(parseUnit(element.unit)).unit;
+                        try {
+                            const unit1 = convertUnitToSI(parseUnit(numberMemoryList[history].unit ?? '')).unit;
+                            const unit2 = element.unit ? convertUnitToSI(parseUnit(element.unit)).unit : [];
 
-                        if (equals(unit1, unit2)) {
-                            element.value = numberMemoryList[history].number;
-                            element.nextSibling.value = numberMemoryList[history].unit ?? '';
-                            element.history = history;
-                            return;
+                            if (unit2.length == 0 || equals(unit1, unit2)) {
+                                element.value = numberMemoryList[history].number;
+                                element.nextSibling.value = numberMemoryList[history].unit ?? '';
+                                element.history = history;
+
+                                if (element.isConverter) element.nextSibling.onchange();
+
+                                return;
+                            }
+                        } catch {
+                            continue;
                         }
                     }
                 }

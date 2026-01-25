@@ -2951,7 +2951,7 @@ DZ9;0.1;6.73e-05;8.98e-03;5600;0.74;15.4;-0.22;15.18;255 239 225
             if (rounded > 10 ** (numberModeScientificSize + 1) || rounded < 10 ** -numberModeScientificSize)
                 return rounded.toExponential();
             else
-                return rounded.toString();
+                return rounded.toPrecision();
         }
 
         // reads a long string one line at a time
